@@ -2,6 +2,7 @@ import { createHash } from 'node:crypto';
 import { STEM, EL_KO, EL_HAN, animal } from './constants';
 import { computeChart, elementNote } from './chart';
 import { baseMatches, yearMatches } from './matches';
+import { ruleInterpret } from './ruleInterpret';
 import { FORTUNE, interpret, type AiJson, type FortuneSpec } from './interpret';
 import type { AnalyzeResult, FortuneSection, SajuInput, Section } from './types';
 
@@ -20,8 +21,13 @@ export async function analyze(input: SajuInput): Promise<AnalyzeResult> {
   const chart = computeChart(input);
   const my = chart.yearBranch, base = baseMatches(my), yr = yearMatches(my);
   let ai: AiJson | null = cache.get(key) ?? null;
+  let source: 'ai' | 'rule' = 'ai';
   if (!ai) {
-    try { ai = await interpret(chart); cache.set(key, ai); } catch (e) { console.error('interpret failed:', (e as Error).message); ai = null; }
+    try { ai = await interpret(chart); cache.set(key, ai); } catch (e) {
+      // 키가 없거나 호출이 실패하면 규칙 기반 풀이로 대체한다.
+      if ((e as Error).message !== 'no-api-key') console.error('interpret failed:', (e as Error).message);
+      ai = ruleInterpret(chart, input.gender); source = 'rule';
+    }
   }
   const total = Object.values(chart.elements).reduce((a, b) => a + b, 0);
   const ds = STEM[chart.dayStem];
@@ -34,9 +40,8 @@ export async function analyze(input: SajuInput): Promise<AnalyzeResult> {
   sections.push(fortuneSection(FORTUNE[4], ai));
   const note = elementNote(chart.elements);
   return {
-    meta: ai
-      ? { isDemo: false, label: '만세력 계산 결과', chartTag: '만세력 계산', note: '사주팔자와 띠 궁합은 만세력으로 계산했고, 해석 문장은 AI가 명식을 바탕으로 작성했어요.', interpFailed: false }
-      : { isDemo: false, label: '만세력 계산 결과', chartTag: '만세력 계산', note: '사주팔자와 띠 궁합은 계산했지만, 해석 문장을 불러오지 못했어요. 잠시 후 다시 시도해 주세요.', interpFailed: true },
+    meta: { isDemo: false, label: '만세력 계산 결과', chartTag: '만세력 계산', interpFailed: false, source,
+      note: source === 'ai' ? '사주팔자와 띠 궁합은 만세력으로 계산했고, 해석 문장은 AI가 명식을 바탕으로 작성했어요.' : '사주팔자와 띠 궁합은 만세력으로 계산했고, 해석 문장은 일간과 십신 분포를 전통 해석 규칙에 따라 풀이한 거예요.' },
     identity: `${animal(my)}띠 · 일간 ${chart.dayStem}(${ds[0]}${EL_KO[ds[1]]})`,
     summary: ai ? ai.summary : `일간 ${chart.dayStem}(${ds[0]}${EL_KO[ds[1]]})를 중심으로 ${note.replace(' 구성이에요.', ' 사주예요.')}`,
     keywords: ai && Array.isArray(ai.keywords) ? ai.keywords.slice(0, 3) : [`${EL_KO[ds[1]]}(${EL_HAN[ds[1]]})의 일간`, `${animal(my)}띠`, '만세력 명식'],

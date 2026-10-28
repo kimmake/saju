@@ -45,7 +45,7 @@ export interface YearSection { id: 'year'; type: 'year'; title: string; icon: st
 export type Section = FortuneSection | MatchSection | YearSection;
 
 export interface AnalyzeResult {
-  meta: { isDemo: boolean; label: string; chartTag: string; note: string; interpFailed: boolean };
+  meta: { isDemo: boolean; label: string; chartTag: string; note: string; interpFailed: boolean; source: 'ai' | 'rule' };
   identity: string;
   summary: string;
   keywords: string[];

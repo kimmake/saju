@@ -183,7 +183,7 @@ export default function ResultScreen({ result: R, title, birthLine, fileName, on
               <button onClick={saveImage} aria-busy={saving} style={{ whiteSpace: 'nowrap', flex: 'none', height: 44, padding: '0 18px', borderRadius: 14, border: '1px solid #574A86', background: 'transparent', color: '#574A86', fontSize: 15, fontWeight: 600, cursor: 'pointer' }}>{saveLabel}</button>
               <button onClick={onRestart} style={{ whiteSpace: 'nowrap', flex: 'none', height: 44, padding: '0 18px', borderRadius: 14, border: 0, background: '#24211D', color: '#FBF8F2', fontSize: 15, fontWeight: 600, cursor: 'pointer' }}>다시 입력하기</button>
             </div>
-            <p style={{ margin: 0, fontSize: 12.5, lineHeight: 1.6, color: '#6B645A' }}>명식은 공개 만세력 라이브러리로 계산하고, 해석 문장은 AI가 명식을 근거로 작성해요. 결과 이미지는 이 기기에서 바로 만들어져요.</p>
+            <p style={{ margin: 0, fontSize: 12.5, lineHeight: 1.6, color: '#6B645A' }}>명식은 공개 만세력 라이브러리로 계산하고, 해석 문장은 {R.meta.source === 'ai' ? 'AI가 명식을 근거로 작성' : '일간과 십신 분포를 규칙에 따라 풀이'}해요. 결과 이미지는 이 기기에서 바로 만들어져요.</p>
           </aside>
           <ShareCard ref={cardRef} result={R} title={title} birthLine={birthLine} />
         </div>
