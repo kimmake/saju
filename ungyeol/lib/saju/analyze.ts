@@ -2,6 +2,7 @@ import { createHash } from 'node:crypto';
 import { STEM, EL_KO, EL_HAN, animal } from './constants';
 import { computeChart, elementNote } from './chart';
 import { baseMatches, yearMatches } from './matches';
+import { sewoon, supplement } from './sewoon';
 import { ruleInterpret } from './ruleInterpret';
 import { FORTUNE, interpret, type AiJson, type FortuneSpec } from './interpret';
 import type { AnalyzeResult, FortuneSection, SajuInput, Section } from './types';
@@ -37,6 +38,7 @@ export async function analyze(input: SajuInput): Promise<AnalyzeResult> {
     notice: `띠 궁합은 전체 사주 중 일부를 바탕으로 한 참고 해석이에요. 이 순위는 태어난 해의 지지(${my})를 기준으로 합(合) 관계를 따져 정했어요.`,
     boundary: `띠는 양력 1월 1일이 아니라 입춘(대개 2월 4일 전후)을 기준으로 바뀌어요. 운결은 만세력의 절기 시각을 기준으로 출생 띠를 정하고, 음력 설날과도 구분해요. 입력한 정보로 계산한 띠는 ${animal(my)}띠(${chart.gz.year}년)예요.` });
   sections.push({ id: 'year', type: 'year', title: '2027년 함께하면 좋은 띠 TOP 3', icon: '未', summary: yr.summary, criteria: yr.criteria, ranks: yr.ranks });
+  sections.push(sewoon(chart));
   sections.push(fortuneSection(FORTUNE[4], ai));
   const note = elementNote(chart.elements);
   return {
@@ -46,6 +48,7 @@ export async function analyze(input: SajuInput): Promise<AnalyzeResult> {
     summary: ai ? ai.summary : `일간 ${chart.dayStem}(${ds[0]}${EL_KO[ds[1]]})를 중심으로 ${note.replace(' 구성이에요.', ' 사주예요.')}`,
     keywords: ai && Array.isArray(ai.keywords) ? ai.keywords.slice(0, 3) : [`${EL_KO[ds[1]]}(${EL_HAN[ds[1]]})의 일간`, `${animal(my)}띠`, '만세력 명식'],
     pillars: chart.pillars, elements: chart.elements, elementNote: note + ` ${total}글자 중 각 오행이 나타난 개수예요.`,
+    supplement: supplement(chart),
     chartNote: ['가운데 강조된 일주의 천간(일간)이 ‘나’를 나타내요.'].concat(chart.notes).join(' '),
     daeun: chart.daeun,
     sections,

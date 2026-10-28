@@ -6,8 +6,8 @@ import type { AnalyzeResult, Element } from '@/lib/saju/types';
 
 const EL: Record<Element, [string, string, string]> = { wood: ['목(木)', '#4F7A55', '목'], fire: ['화(火)', '#B0493A', '화'], earth: ['토(土)', '#9A7430', '토'], metal: ['금(金)', '#6E737B', '금'], water: ['수(水)', '#3C5A85', '수'] };
 const ELX: Record<string, [string, string, string]> = { ...EL, none: ['', '#A39C90', ''] };
-const CIRCLED = ['①', '②', '③', '④', '⑤', '⑥', '⑦'];
-const SHORT: Record<string, string> = { children: '자녀운', spouse: '배우자운', money: '금전운', work: '직장운', match: '어울리는 띠', year: '2027년 띠', study: '공부운' };
+const CIRCLED = ['①', '②', '③', '④', '⑤', '⑥', '⑦', '⑧'];
+const SHORT: Record<string, string> = { children: '자녀운', spouse: '배우자운', money: '금전운', work: '직장운', match: '어울리는 띠', year: '2027년 띠', sewoon: '2027년 운세', study: '공부운' };
 const card = { background: '#FBF8F2', border: '1px solid rgba(36,33,29,.1)', borderRadius: 24, padding: 'clamp(18px,4vw,26px)', display: 'flex', flexDirection: 'column', gap: 18 } as const;
 const tag = { whiteSpace: 'nowrap', fontSize: 12.5, fontWeight: 600, padding: '4px 10px', borderRadius: 999, border: '1px solid rgba(87,74,134,.5)', color: '#574A86' } as const;
 
@@ -149,13 +149,20 @@ export default function ResultScreen({ result: R, title, birthLine, fileName, on
             ))}
           </div>
           <p style={{ margin: 0, fontSize: 13.5, color: '#5A544B', lineHeight: 1.6 }}>{R.elementNote}</p>
+          <div style={{ padding: '16px 18px', borderRadius: 16, background: '#F3EAD6', display: 'flex', flexDirection: 'column', gap: 10 }}>
+            <p style={{ margin: 0, fontSize: 14, fontWeight: 700, color: '#5C4A1F' }}>✦ 부족한 부분을 보완하려면</p>
+            <p style={{ margin: 0, fontSize: 13.5, lineHeight: 1.65, color: '#2E2A25' }}>{R.supplement.lead}</p>
+            <ul style={{ margin: 0, paddingLeft: 18, display: 'flex', flexDirection: 'column', gap: 6, fontSize: 14.5, lineHeight: 1.6, color: '#2E2A25' }}>
+              {R.supplement.items.map(t => <li key={t}>{t}</li>)}
+            </ul>
+          </div>
         </div>
       </section>
 
       <div style={{ display: 'flex', flexDirection: wide ? 'row' : 'column', gap: 32, alignItems: 'flex-start' }}>
         {wide ? (
           <nav aria-label="결과 항목 바로가기" style={{ position: 'sticky', top: 24, flex: '0 0 232px', background: '#FBF8F2', border: '1px solid rgba(36,33,29,.1)', borderRadius: 24, padding: '18px 12px', display: 'flex', flexDirection: 'column', gap: 4 }}>
-            <p style={{ margin: '0 12px 8px', fontSize: 13, fontWeight: 600, color: '#6B645A' }}>일곱 가지 이야기</p>
+            <p style={{ margin: '0 12px 8px', fontSize: 13, fontWeight: 600, color: '#6B645A' }}>여덟 가지 이야기</p>
             {navItems.map(n => (
               <button key={n.id} onClick={() => goTo(n.id)} aria-current={n.on ? 'true' : undefined} style={{ display: 'flex', alignItems: 'center', gap: 10, textAlign: 'left', padding: '10px 12px', borderRadius: 12, border: 0, cursor: 'pointer', fontSize: 15, background: n.on ? '#ECE8F3' : 'transparent', color: n.on ? '#3E3366' : '#3A352F', fontWeight: n.on ? 700 : 500 }}>
                 <span className="serif" style={{ width: 22, color: n.on ? '#574A86' : '#7D5F24' }}>{n.no}</span>{n.short}

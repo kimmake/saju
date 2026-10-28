@@ -2,7 +2,7 @@
 import type { CSSProperties, ChangeEvent, FormEvent } from 'react';
 import { cleanDigits, dstType, validate, type FormState } from '@/lib/form';
 
-const TOPICS = ['자녀운', '배우자운', '금전운', '직장운', '나와 어울리는 띠', '2027년 함께하면 좋은 띠', '공부운'];
+const TOPICS = ['자녀운', '배우자운', '금전운', '직장운', '나와 어울리는 띠', '2027년 함께하면 좋은 띠', '2027년 나의 운세', '공부운'];
 const labelS: CSSProperties = { fontSize: 13, color: '#4A453E' };
 const legendS: CSSProperties = { fontSize: 15, fontWeight: 600, padding: 0, marginBottom: 10 };
 const fieldsetS: CSSProperties = { border: 0, margin: 0, padding: 0, display: 'flex', flexDirection: 'column', gap: 10 };
@@ -58,7 +58,7 @@ export default function InputScreen({ form: f, touched, submitted, formError, on
         <svg width="168" height="18" viewBox="0 0 168 18" aria-hidden="true" style={{ display: 'block', margin: '22px 0 20px' }}><path d="M2 12 Q 22 2 42 10 T 82 10 T 122 10 T 166 8" stroke="#A8833F" strokeWidth="1.4" fill="none" strokeLinecap="round" /></svg>
         <p style={{ margin: 0, fontSize: 18, lineHeight: 1.7, color: '#4A453E', maxWidth: 440 }}>타고난 기질부터 관계, 재물, 공부와 일의 흐름까지.</p>
         <div style={{ marginTop: 'clamp(24px,5vw,40px)', padding: 'clamp(16px,4vw,22px) clamp(16px,4vw,24px)', borderRadius: 20, background: 'rgba(251,248,242,.6)', border: '1px solid rgba(36,33,29,.08)', maxWidth: 460 }}>
-          <p style={{ margin: '0 0 12px', fontSize: 13, fontWeight: 600, color: '#6B645A' }}>결과에서 살펴볼 일곱 가지 이야기</p>
+          <p style={{ margin: '0 0 12px', fontSize: 13, fontWeight: 600, color: '#6B645A' }}>결과에서 살펴볼 여덟 가지 이야기</p>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
             {TOPICS.map(t => <span key={t} style={{ whiteSpace: 'nowrap', fontSize: 14, padding: '6px 12px', borderRadius: 999, background: '#FBF8F2', border: '1px solid rgba(36,33,29,.1)', color: '#3A352F' }}>{t}</span>)}
           </div>
