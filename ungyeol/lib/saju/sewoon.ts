@@ -1,5 +1,6 @@
 import { STEM, BRANCH, EL_KO, EL_HAN, SANHE, rel, tenGod } from './constants';
 import type { Chart } from './chart';
+import { pickPeople, pickStudy, type Pick } from './picks';
 import type { Element, FortuneSection } from './types';
 
 /**
@@ -92,9 +93,10 @@ export function sewoon(chart: Chart): FortuneSection {
     '운의 해는 양력 1월 1일이 아니라 입춘(2월 4일 전후)부터 바뀌어요. 이 풀이는 사건이나 시기를 맞히는 것이 아니라 올해의 흐름 성향을 참고하는 용도예요.',
   ];
 
+  const people = pickPeople(chart)[0], study = pickStudy(chart)[0];
   const tips = [
-    '새로운 사람들을 많이 만나 보세요. 모임·동호회·소개 자리 중 한 곳에 나가 보는 것부터 시작해도 좋아요.',
-    '새로운 공부를 시작해 보세요. 관심은 있었지만 미뤄 온 분야의 입문서나 강의 하나를 정해 두면 돼요.',
+    `${people.title}: ${people.text}`,
+    `${study.title}: ${study.text}`,
     `올해 흐름(${gS})에 맞춰 ${grp === '비겁' ? '협업 규칙을 먼저 정해 보세요' : grp === '식상' ? '만든 것을 한 번 공개해 보세요' : grp === '재성' ? '지출 한도를 먼저 정해 보세요' : grp === '관성' ? '떠안은 일을 나눠 보세요' : '배움의 시작일을 달력에 적어 보세요'}.`,
   ];
   if (rels.some(r => r.includes('충'))) tips.push('충이 있는 영역은 변화를 두려워하기보다 큰 결정 전에 한 번 더 점검하는 습관으로 대비해 보세요.');
@@ -112,7 +114,6 @@ export function sewoon(chart: Chart): FortuneSection {
   };
 }
 
-export const SUPPLEMENT_COMMON = ['새로운 사람들을 많이 만나 보기', '새로운 공부를 시작해 보기'];
 const EL_ACT: Record<Element, string> = {
   wood: '산책하거나 식물을 가꾸고, 새로운 일을 하나 시작해 보기',
   fire: '햇볕을 쬐며 몸을 움직이고, 마음을 표현하는 활동 해 보기',
@@ -120,11 +121,11 @@ const EL_ACT: Record<Element, string> = {
   metal: '미루던 일을 정리하고 결정을 내려 마무리하는 연습하기',
   water: '충분히 쉬고 물을 자주 마시며, 독서와 사색 시간 갖기',
 };
-export function supplement(chart: Chart): { lead: string; items: string[] } {
+export function supplement(chart: Chart): { lead: string; items: Pick[] } {
   const els = chart.elements, ks = Object.keys(els) as Element[], min = Math.min(...ks.map(k => els[k]));
   const low = ks.filter(k => els[k] === min && min <= 1);
   const lead = low.length
     ? `${low.map(k => `${EL_KO[k]}(${EL_HAN[k]})`).join('·')} 기운이 ${min === 0 ? '비어 있어요' : '적어요'}. 부족한 부분을 보완하려면 아래를 추가로 해 보면 도움이 돼요.`
     : '오행이 고르게 갖춰져 있어요. 균형을 유지하고 시야를 넓히려면 아래를 해 보면 도움이 돼요.';
-  return { lead, items: [...low.map(k => EL_ACT[k]), ...SUPPLEMENT_COMMON] };
+  return { lead, items: [...low.map(k => ({ title: `${EL_KO[k]}(${EL_HAN[k]}) 기운 채우기`, text: EL_ACT[k] })), ...pickPeople(chart), ...pickStudy(chart)] };
 }

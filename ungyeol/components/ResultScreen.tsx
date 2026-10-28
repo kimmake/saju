@@ -153,7 +153,7 @@ export default function ResultScreen({ result: R, title, birthLine, fileName, on
             <p style={{ margin: 0, fontSize: 14, fontWeight: 700, color: '#5C4A1F' }}>✦ 부족한 부분을 보완하려면</p>
             <p style={{ margin: 0, fontSize: 13.5, lineHeight: 1.65, color: '#2E2A25' }}>{R.supplement.lead}</p>
             <ul style={{ margin: 0, paddingLeft: 18, display: 'flex', flexDirection: 'column', gap: 6, fontSize: 14.5, lineHeight: 1.6, color: '#2E2A25' }}>
-              {R.supplement.items.map(t => <li key={t}>{t}</li>)}
+              {R.supplement.items.map(t => <li key={t.title}><strong>{t.title}</strong> — {t.text}</li>)}
             </ul>
           </div>
         </div>

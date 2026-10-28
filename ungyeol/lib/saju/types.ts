@@ -52,7 +52,7 @@ export interface AnalyzeResult {
   pillars: Pillar[];
   elements: Record<Element, number>;
   elementNote: string;
-  supplement: { lead: string; items: string[] };
+  supplement: { lead: string; items: { title: string; text: string }[] };
   chartNote: string;
   daeun: string | null;
   sections: Section[];

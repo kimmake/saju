@@ -2,6 +2,7 @@ import { STEM, BRANCH, EL_KO, EL_HAN, GEN, SANHE, rel, tenGod } from './constant
 import type { Element } from './types';
 import type { Chart } from './chart';
 import type { AiJson } from './interpret';
+import { pickStudy } from './picks';
 
 /**
  * 규칙 기반 해석: 일간·십신 분포·월지·일지·시지를 근거로 전통 명리 입문 해석(자평명리의 십신론)을 문장으로 옮긴 것.
@@ -242,7 +243,7 @@ export function ruleInterpret(chart: Chart, gender: 'female' | 'male' | null): A
     study: {
       summary: `${study.summary.replace(/요\.$/, '요.')} 고전과 새로운 학문에 도전하면 좋아요.`,
       body: [`${ev('인성')} 학습 성향을 이렇게 볼 수 있어요.`, study.s2, ch.s, `${a.monthGod ? `월지에 ${a.monthGod}${iga(a.monthGod)} 있어 공부에서도 ${tr(a.monthGod)} 힘이 돼요.` : ''}`, seasonSentence, daeunLine].filter(Boolean),
-      tips: [...study.tips.slice(0, 2), ch.tip, EXTRA_TIP.study],
+      tips: [...study.tips.slice(0, 2), ch.tip, ...pickStudy(chart).slice(0, 1).map(p => `${p.title}: ${p.text}`)],
       details: [{ label: '집중에 도움이 되는 환경', text: `${info.env}에서 집중이 잘 되는 기질이에요. ${study.d[0]}` }, { label: '주의할 습관', text: study.d[1] }, { label: '오행으로 보는 균형', text: elemFor('study') }, { label: `일간 ${chart.dayStem}의 한마디`, text: stemLine('study') }],
     },
   };
