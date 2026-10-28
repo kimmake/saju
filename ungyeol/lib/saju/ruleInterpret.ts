@@ -1,4 +1,4 @@
-import { STEM, EL_KO, EL_HAN } from './constants';
+import { STEM, EL_KO, EL_HAN, SANHE, rel, tenGod } from './constants';
 import type { Chart } from './chart';
 import type { AiJson } from './interpret';
 
@@ -28,6 +28,8 @@ const STEM_INFO: Record<string, { image: string; trait: string; env: string }> =
   癸: { image: '촉촉한 비와 이슬', trait: '차분하고 감수성이 풍부하며 통찰이 깊은', env: '조용하고 아늑한 공간' },
 };
 const tr = (g: string) => `${GOD_TRAIT[g]}${iga(GOD_TRAIT[g])}`;
+// 지장간(地藏干): 지지 속에 숨은 천간. 마지막 글자가 정기(본기)다.
+const HIDDEN: Record<string, string> = { 子: '壬癸', 丑: '癸辛己', 寅: '戊丙甲', 卯: '甲乙', 辰: '乙癸戊', 巳: '戊庚丙', 午: '丙己丁', 未: '丁乙己', 申: '戊壬庚', 酉: '庚辛', 戌: '辛丁戊', 亥: '戊甲壬' };
 const lv = (n: number): Lv => (n >= 3 ? 'high' : n === 2 ? 'mid' : 'low');
 const iga = (w: string) => { const c = w.charCodeAt(w.length - 1); return c >= 0xac00 && c <= 0xd7a3 && (c - 0xac00) % 28 === 0 ? '가' : '이'; };
 const topic = (w: string) => { const c = w.charCodeAt(w.length - 1); return c >= 0xac00 && c <= 0xd7a3 && (c - 0xac00) % 28 === 0 ? '는' : '은'; };
@@ -115,7 +117,7 @@ const STUDY_CHALLENGE: Record<Group, { s: string; tip: string }> = {
   비겁: { s: '비겁이 강해 함께 배울 때 힘이 나니, 고전 읽기 모임이나 새로운 학문을 함께 배울 사람을 찾으면 꾸준히 이어 가기 좋아요.', tip: '고전을 같이 읽거나 새 분야를 같이 배울 사람과 주 1회 이야기 나눠 보세요.' },
 };
 
-export interface Analysis { counts: Record<Group, number>; dominant: Group; strength: 'strong' | 'weak' | 'balanced'; monthGod?: string; dayBranchGod?: string; timeBranchGod?: string }
+export interface Analysis { hidden: Set<Group>; counts: Record<Group, number>; dominant: Group; strength: 'strong' | 'weak' | 'balanced'; monthGod?: string; dayBranchGod?: string; timeBranchGod?: string }
 
 export function analyzeGods(chart: Chart): Analysis {
   const counts: Record<Group, number> = { 비겁: 0, 식상: 0, 재성: 0, 관성: 0, 인성: 0 };
@@ -128,12 +130,35 @@ export function analyzeGods(chart: Chart): Analysis {
   const monthGod = month.branchGod, monthGroup = monthGod ? GROUP[monthGod] : undefined;
   const order: Group[] = [...(monthGroup ? [monthGroup] : []), '식상', '재성', '관성', '인성', '비겁'];
   const dominant = order.reduce((best, g) => (counts[g] > counts[best] ? g : best), order[0]);
-  const self = counts.비겁 + counts.인성 + (monthGroup === '비겁' || monthGroup === '인성' ? 1 : 0);
-  const other = counts.식상 + counts.재성 + counts.관성 + (monthGroup && monthGroup !== '비겁' && monthGroup !== '인성' ? 1 : 0);
-  return { counts, dominant, strength: self > other ? 'strong' : self < other ? 'weak' : 'balanced', monthGod, dayBranchGod: day.branchGod, timeBranchGod: time.unknown ? undefined : time.branchGod };
+  // 지장간: 정기를 뺀 숨은 천간(중기·여기)은 0.5로 세어 강약 판단에 더하고, 어떤 십신이 숨어 있는지도 기록한다.
+  const hidden = new Set<Group>(), extra: Record<Group, number> = { 비겁: 0, 식상: 0, 재성: 0, 관성: 0, 인성: 0 };
+  chart.pillars.forEach(p => {
+    if (p.unknown) return;
+    const hs = HIDDEN[p.branch];
+    [...hs].forEach((h, i) => { const g = GROUP[tenGod(chart.dayStem, h)]; hidden.add(g); if (i < hs.length - 1) extra[g] += 0.5; });
+  });
+  const self = counts.비겁 + counts.인성 + extra.비겁 + extra.인성 + (monthGroup === '비겁' || monthGroup === '인성' ? 1 : 0);
+  const other = counts.식상 + counts.재성 + counts.관성 + extra.식상 + extra.재성 + extra.관성 + (monthGroup && monthGroup !== '비겁' && monthGroup !== '인성' ? 1 : 0);
+  return { hidden, counts, dominant, strength: self > other ? 'strong' : self < other ? 'weak' : 'balanced', monthGod, dayBranchGod: day.branchGod, timeBranchGod: time.unknown ? undefined : time.branchGod };
 }
 
-const cntText = (g: Group, n: number) => (n === 0 ? `${GROUP_LABEL[g]}${iga(GROUP_LABEL[g])} 겉으로 드러난 글자에는 없고` : `${GROUP_LABEL[g]}${iga(GROUP_LABEL[g])} ${n}개로 ${n >= 3 ? '많고' : n === 2 ? '적당하고' : '적고'}`);
+const cntText = (g: Group, n: number, hid: boolean) => (n === 0 ? `${GROUP_LABEL[g]}${iga(GROUP_LABEL[g])} 겉으로 드러난 글자에는 없${hid ? '지만 지지 속에 숨어 있고' : '고'}` : `${GROUP_LABEL[g]}${iga(GROUP_LABEL[g])} ${n}개로 ${n >= 3 ? '많고' : n === 2 ? '적당하고' : '적고'}`);
+
+const POS = ['시지', '일지', '월지', '년지'];
+/** 대상 지지(인덱스 t)와 다른 지지의 관계: 충(沖)을 먼저, 없으면 합(合)을 찾는다. */
+function branchRelation(chart: Chart, t: number): { kind: 'chong' | 'he'; other: string } | null {
+  const bs = chart.pillars.map(p => (p.unknown ? null : p.branch));
+  if (!bs[t]) return null;
+  const others = [1, 2, 3, 0].filter(i => i !== t && bs[i]);
+  const c = others.find(i => rel(bs[t]!, bs[i]!) === 'chong'); if (c !== undefined) return { kind: 'chong', other: POS[c] };
+  const h = others.find(i => rel(bs[t]!, bs[i]!) === 'liuhe'); if (h !== undefined) return { kind: 'he', other: POS[h] };
+  return null;
+}
+function sanheSentence(chart: Chart): string {
+  const bs = chart.pillars.filter(p => !p.unknown).map(p => p.branch);
+  const g = SANHE.find(([chars]) => [...chars].every(c => bs.includes(c)));
+  return g ? ` ${g[0]} 삼합이 갖춰져 ${EL_KO[g[1]]}(${EL_HAN[g[1]]}) 기운이 힘을 얻는 구조예요.` : '';
+}
 
 export function ruleInterpret(chart: Chart, gender: 'female' | 'male' | null): AiJson {
   const a = analyzeGods(chart), info = STEM_INFO[chart.dayStem], ds = STEM[chart.dayStem];
@@ -151,6 +176,10 @@ export function ruleInterpret(chart: Chart, gender: 'female' | 'male' | null): A
   const work = WORK[a.dominant];
   const study = STUDY[lv(a.counts.인성)], ch = STUDY_CHALLENGE[a.dominant];
 
+  const rChild = branchRelation(chart, 0), rSpouse = branchRelation(chart, 1), rWork = branchRelation(chart, 2);
+  const childRel = rChild ? (rChild.kind === 'chong' ? ` 시지가 ${rChild.other}와 충(沖)을 이루어 자녀나 어린 세대와의 관계에서 거리 조절이나 변화가 필요한 때가 있을 수 있어요.` : ` 시지가 ${rChild.other}와 합(合)을 이루어 자녀나 어린 세대와 가까이 이어지려는 힘이 있어요.`) : '';
+  const spouseRel = rSpouse ? (rSpouse.kind === 'chong' ? `배우자궁인 일지가 ${rSpouse.other}와 충(沖)을 이루어 관계에서 의견이 부딪히거나 변화가 생기기 쉬운 면이 있어요. 서로 다름을 조율하는 대화가 도움이 돼요.` : `배우자궁인 일지가 ${rSpouse.other}와 합(合)을 이루어 가까운 사이에서 서로 끌리고 맞춰 가려는 힘이 있어요.`) : '';
+  const workRel = (rWork ? (rWork.kind === 'chong' ? `월지가 ${rWork.other}와 충(沖)을 이루어 환경 변화나 이동이 잦거나 마음이 흔들릴 때가 있을 수 있어요. 큰 결정 전에는 한 번 더 점검해 보세요.` : `월지가 ${rWork.other}와 합(合)을 이루어 조직이나 사람들과 조화를 이루려는 힘이 있어요.`) : '') + sanheSentence(chart);
   const timeSentence = a.timeBranchGod ? `자녀·말년을 보는 시주 지지에는 ${a.timeBranchGod}${iga(a.timeBranchGod)} 있어 ${tr(a.timeBranchGod)} 드러나는 편이에요.` : '태어난 시간을 몰라 시주가 보여 주는 자녀·말년의 흐름은 풀이에서 뺐어요.';
   const spouseSentence = a.dayBranchGod ? `배우자궁인 일지에 ${a.dayBranchGod}${iga(a.dayBranchGod)} 있어 가까운 사이에서는 ${tr(a.dayBranchGod)} 드러나기 쉬워요.` : '';
   const monthSentence = a.monthGod ? `월지에 ${a.monthGod}${iga(a.monthGod)} 있어 사회생활에서 ${tr(a.monthGod)} 자주 쓰이는 편이에요.` : '';
@@ -159,15 +188,15 @@ export function ruleInterpret(chart: Chart, gender: 'female' | 'male' | null): A
   const elemSentence = zero.length ? `${zero.map(k => `${EL_KO[k]}(${EL_HAN[k]})`).join('·')} 기운이 비어 있어, 그 기운과 관련된 활동을 일상에 조금 더해 보는 것도 좋아요.` : '오행이 두루 갖춰져 있어 한쪽으로 치우치지 않고 상황에 맞게 대응하는 힘이 있어요.';
 
   const keywords = [GROUP_WORD[a.dominant], `${info.image} 기질`, zero.length ? `${EL_KO[zero[0]]}(${EL_HAN[zero[0]]}) 보완` : '균형 잡힌 오행'];
-  const ev = (g: Group) => `${dayLabel} ${cntText(g, a.counts[g])},`;
+  const ev = (g: Group) => `${dayLabel} ${cntText(g, a.counts[g], a.hidden.has(g))},`;
 
   return {
     summary: `${info.image} 같은 일간에 ${GROUP_WORD[a.dominant]}${iga(GROUP_WORD[a.dominant])} 돋보이는 사주예요.`,
     keywords,
-    children: { summary: children.summary, body: [`${ev(childG)} 이 기운은 ${childEv}기운이에요.`, children.s2, timeSentence, `${img}이 아이와의 관계에서도 은연중에 드러나요.`], tips: children.tips, details: [{ label: '소통에서의 강점', text: children.d[0] }, { label: '신경 쓰면 좋은 점', text: children.d[1] }] },
-    spouse: { summary: spouse.summary, body: [`${ev(spouseG)} 관계를 대하는 태도는 아래와 같이 읽을 수 있어요.`, spouse.s2, spouseSentence, '결혼이나 인연의 시기는 사주만으로 정할 수 없고, 이 풀이는 관계를 대하는 성향을 참고하는 용도예요.'].filter(Boolean), tips: spouse.tips, details: [{ label: '잘 맞을 수 있는 상대', text: spouse.d[0] }, { label: '관계에서 주의할 점', text: spouse.d[1] }] },
+    children: { summary: children.summary, body: [`${ev(childG)} 이 기운은 ${childEv}기운이에요.`, children.s2, timeSentence + childRel, `${img}이 아이와의 관계에서도 은연중에 드러나요.`], tips: children.tips, details: [{ label: '소통에서의 강점', text: children.d[0] }, { label: '신경 쓰면 좋은 점', text: children.d[1] }] },
+    spouse: { summary: spouse.summary, body: [`${ev(spouseG)} 관계를 대하는 태도는 아래와 같이 읽을 수 있어요.`, spouse.s2, [spouseSentence, spouseRel].filter(Boolean).join(' '), '결혼이나 인연의 시기는 사주만으로 정할 수 없고, 이 풀이는 관계를 대하는 성향을 참고하는 용도예요.'].filter(Boolean), tips: spouse.tips, details: [{ label: '잘 맞을 수 있는 상대', text: spouse.d[0] }, { label: '관계에서 주의할 점', text: spouse.d[1] }] },
     money: { summary: money.summary, body: [`${ev('재성')} 돈을 대하는 성향은 아래와 같아요.`, money.s2, strengthSent, bigeopNote], tips: money.tips, details: [{ label: '재정 관리에서의 강점', text: money.d[0] }, { label: '소비할 때 주의할 습관', text: money.d[1] }] },
-    work: { summary: work.summary, body: [`${img}에, 십신 중 ${GROUP_LABEL[a.dominant]}${iga(GROUP_LABEL[a.dominant])} 가장 두드러져요.`, work.s2, monthSentence, `${elemSentence}`].filter(Boolean), tips: work.tips, details: [{ label: '직무를 탐색할 때 참고할 성향', text: work.d[0] }, { label: '이직이나 새로운 도전 전 점검할 것', text: work.d[1] }] },
+    work: { summary: work.summary, body: [`${img}에, 십신 중 ${GROUP_LABEL[a.dominant]}${iga(GROUP_LABEL[a.dominant])} 가장 두드러져요.`, work.s2, [monthSentence, workRel].filter(Boolean).join(' '), elemSentence].filter(Boolean), tips: work.tips, details: [{ label: '직무를 탐색할 때 참고할 성향', text: work.d[0] }, { label: '이직이나 새로운 도전 전 점검할 것', text: work.d[1] }] },
     study: {
       summary: `${study.summary.replace(/요\.$/, '요.')} 고전과 새로운 학문에 도전하면 좋아요.`,
       body: [`${ev('인성')} 학습 성향을 이렇게 볼 수 있어요.`, study.s2, ch.s, `${a.monthGod ? `월지에 ${a.monthGod}${iga(a.monthGod)} 있어 공부에서도 ${tr(a.monthGod)} 힘이 돼요.` : ''}`].filter(Boolean),
