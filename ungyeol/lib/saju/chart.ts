@@ -11,6 +11,7 @@ export interface Chart {
   yearBranch: string;
   notes: string[];
   daeun: string | null;
+  curDaeun: string | null;
 }
 
 export function computeChart(input: SajuInput): Chart {
@@ -60,15 +61,16 @@ export function computeChart(input: SajuInput): Chart {
   const elements: Record<Element, number> = { wood: 0, fire: 0, earth: 0, metal: 0, water: 0 };
   pillars.forEach(p => { if (!p.unknown) { elements[p.stemEl as Element]++; elements[p.branchEl as Element]++; } });
 
-  let daeun: string | null = null;
+  let daeun: string | null = null, curDaeun: string | null = null;
   if (input.gender) {
     try {
       const yun = ecInst.getYun(input.gender === 'male' ? 1 : 0), list = yun.getDaYun(), now = new Date().getFullYear();
       const first = list[1], cur = list.find((x: any, i: number) => i > 0 && x.getStartYear() <= now && now <= x.getEndYear());
+      curDaeun = cur ? (cur.getGanZhi() as string) : null;
       daeun = `대운은 ${first.getStartAge()}세 무렵 시작해요.` + (cur ? ` 지금은 ${cur.getGanZhi()} 대운(${cur.getStartYear()}–${cur.getEndYear()}년)을 지나고 있어요.` : '');
     } catch { daeun = null; }
   }
-  return { gz, pillars, elements, dayStem, yearBranch: gz.year[1], notes, daeun };
+  return { gz, pillars, elements, dayStem, yearBranch: gz.year[1], notes, daeun, curDaeun };
 }
 
 export function elementNote(el: Record<Element, number>): string {

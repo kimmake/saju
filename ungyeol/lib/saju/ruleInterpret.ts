@@ -1,4 +1,5 @@
-import { STEM, EL_KO, EL_HAN, SANHE, rel, tenGod } from './constants';
+import { STEM, BRANCH, EL_KO, EL_HAN, GEN, SANHE, rel, tenGod } from './constants';
+import type { Element } from './types';
 import type { Chart } from './chart';
 import type { AiJson } from './interpret';
 
@@ -30,6 +31,36 @@ const STEM_INFO: Record<string, { image: string; trait: string; env: string }> =
 const tr = (g: string) => `${GOD_TRAIT[g]}${iga(GOD_TRAIT[g])}`;
 // 지장간(地藏干): 지지 속에 숨은 천간. 마지막 글자가 정기(본기)다.
 const HIDDEN: Record<string, string> = { 子: '壬癸', 丑: '癸辛己', 寅: '戊丙甲', 卯: '甲乙', 辰: '乙癸戊', 巳: '戊庚丙', 午: '丙己丁', 未: '丁乙己', 申: '戊壬庚', 酉: '庚辛', 戌: '辛丁戊', 亥: '戊甲壬' };
+type Topic = 'children' | 'spouse' | 'money' | 'work' | 'study';
+// 일간별 항목 한마디
+const STEM_TOPIC: Record<string, Record<Topic, string>> = {
+  甲: { children: '곧은 큰 나무처럼 아이가 자기 길을 곧게 자라도록 방향을 잡아 주려는 마음이 커요.', spouse: '존중받고 싶고 먼저 나서 이끌려는 편이라, 상대의 속도를 기다려 주면 관계가 편안해져요.', money: '한번 세운 계획을 밀고 가는 힘이 있어 목표를 정하면 꾸준히 모으는 편이에요.', work: '앞장서서 길을 열고 새로 시작하는 일에서 힘이 나요.', study: '큰 틀을 세우고 줄기를 먼저 잡는 공부 방식이 잘 맞아요.' },
+  乙: { children: '아이의 눈높이에 맞춰 부드럽게 적응하며 자라도록 돕는 편이에요.', spouse: '상대에게 자연스럽게 맞춰 주는 유연함이 있지만 속마음을 참기 쉬워요.', money: '지출을 상황에 맞춰 유연하게 조절하는 감각이 좋아요.', work: '사람 사이를 부드럽게 잇고 협력하는 환경에서 빛나요.', study: '조금씩 꾸준히 뻗어 나가는 공부, 함께 하는 공부에서 힘이 붙어요.' },
+  丙: { children: '밝은 에너지로 아이에게 자신감을 북돋아 주는 편이에요.', spouse: '솔직하고 따뜻하게 마음을 드러내지만, 감정이 오를 땐 한 박자 쉬어 가면 좋아요.', money: '쓸 때 시원하게 쓰는 면이 있어 고정비와 변동비를 나눠 보면 좋아요.', work: '사람들 앞에서 분위기를 밝히고 이끄는 역할에 어울려요.', study: '발표·토론처럼 드러내며 배우는 방식에서 이해가 빨라요.' },
+  丁: { children: '섬세하게 아이의 기분을 살피는 따뜻한 돌봄이 강점이에요.', spouse: '작은 배려로 마음을 전하는 편이라 상대가 세심함을 느끼기 쉬워요.', money: '필요한 곳을 세심하게 챙기지만 기분에 따른 소비가 생기기 쉬우니 기준을 두면 좋아요.', work: '한 가지에 깊이 몰입하는 정교한 작업에 강해요.', study: '집중이 시작되면 깊게 파고드는 몰입형이라 방해 없는 시간대가 중요해요.' },
+  戊: { children: '묵직하게 중심을 잡아 주는 든든한 보호자 역할을 해요.', spouse: '믿음직하고 변함없는 태도가 강점이지만 표현이 무뚝뚝해 보일 수 있어요.', money: '쉽게 흔들리지 않고 가진 것을 지키는 데 강해요.', work: '조직의 중심을 잡고 신뢰를 주는 관리·조율 역할에 어울려요.', study: '기초를 단단히 쌓고 한 번 익히면 오래 가는 공부를 해요.' },
+  己: { children: '세심하게 길러 내는 양육 스타일로 아이의 필요를 잘 알아채요.', spouse: '상대를 챙기고 포용하는 마음이 크지만 자신의 필요도 말해 보면 좋아요.', money: '알뜰하게 살림을 꾸리고 쓰임새를 따지는 감각이 좋아요.', work: '꼼꼼하게 일을 다듬고 뒷받침하는 실무에서 빛나요.', study: '꼼꼼한 정리와 반복 학습으로 실력을 쌓는 데 강해요.' },
+  庚: { children: '원칙과 약속을 분명히 알려 주는 단단한 가르침을 줘요.', spouse: '의리와 책임감이 강하지만 말이 직설적으로 들릴 수 있어 표현을 다듬으면 좋아요.', money: '손익을 분명히 따지는 결단력이 있어 정리와 구조조정에 강해요.', work: '결단이 필요한 일, 기준을 세우고 정리하는 일에 어울려요.', study: '핵심을 쳐내고 요점을 잡는 공부, 문제 풀이 중심 학습에 강해요.' },
+  辛: { children: '아이의 장점을 섬세하게 다듬어 주려는 편이지만 기준이 높아지기 쉬워요.', spouse: '상대를 예민하게 살피고 품격 있는 관계를 바라는 편이에요.', money: '품질을 따져 사서 오래 쓰는 소비 스타일이 많아요.', work: '정밀하고 완성도가 중요한 일, 전문성이 필요한 일에 강해요.', study: '정확성을 중시해 오답을 다듬는 공부에서 실력이 올라요.' },
+  壬: { children: '넓은 시야로 아이가 다양한 경험을 하도록 열어 주려는 편이에요.', spouse: '넓게 포용하고 자유로운 관계를 바라지만 속마음을 숨기기 쉬워요.', money: '흐름을 읽고 융통성 있게 움직이는 감각이 좋아요.', work: '변화가 많고 다양한 사람을 만나는 환경에서 적응이 빨라요.', study: '폭넓게 읽고 연결해 이해하는 통합형 공부에 강해요.' },
+  癸: { children: '조용히 스며들듯 아이의 감정을 읽고 돌보는 편이에요.', spouse: '감수성이 풍부하고 상대의 마음을 잘 읽지만 혼자 삭이기 쉬워요.', money: '조용히 모으고 필요할 때 쓰는 신중한 스타일이에요.', work: '분석하고 통찰하는 일, 조용히 깊이 일하는 환경에서 힘이 나요.', study: '생각을 오래 숙성해 통찰을 얻는 공부, 글쓰기·사색형에 강해요.' },
+};
+// 적거나 없는 오행을 보완하는 항목별 제안
+const ELEM_TOPIC: Record<Topic, Record<Element, string>> = {
+  children: { wood: '아이와 새로운 것을 함께 시작하는 활동(산책·식물 기르기 등)을 더하면 좋아요.', fire: '아이에게 웃음과 칭찬을 의식적으로 더 표현해 보면 좋아요.', earth: '식사·잠자리 같은 일정한 생활 리듬을 함께 만들어 보면 좋아요.', metal: '약속과 규칙을 또렷하게 정해 주는 연습이 도움이 돼요.', water: '아이의 이야기를 느긋하게 듣는 조용한 대화 시간이 도움이 돼요.' },
+  spouse: { wood: '관계에 새로운 시도(여행·취미 함께하기)를 더하면 활력이 생겨요.', fire: '애정 표현과 칭찬을 말로 더 자주 건네면 좋아요.', earth: '서로 믿고 기대는 안정적인 생활 습관을 만들어 보면 좋아요.', metal: '불편한 일을 미루지 말고 경계를 부드럽게 말하는 연습이 도움이 돼요.', water: '대화를 서두르지 말고 서로의 마음을 천천히 나눌 시간을 가지면 좋아요.' },
+  money: { wood: '새로운 수입원이나 배움에 쓰는 비용을 계획에 넣어 보면 좋아요.', fire: '즐거움에 쓰는 비용도 한도 안에서 허용해 두면 무리한 절약을 피할 수 있어요.', earth: '저축·보험 같은 기본 안전망을 먼저 갖추는 것이 도움이 돼요.', metal: '지출 기준과 한도를 분명히 정해 두면 좋아요.', water: '현금 흐름을 여유 있게 두고 급할 때 쓸 비상금을 마련해 두면 좋아요.' },
+  work: { wood: '새로운 일을 시작하거나 배우는 기회를 일부러 만들어 보면 좋아요.', fire: '존재감을 드러내고 의견을 말하는 연습이 도움이 돼요.', earth: '한 자리에서 신뢰를 쌓는 꾸준함을 의식하면 좋아요.', metal: '마감과 우선순위를 단호하게 정하는 습관이 도움이 돼요.', water: '결정 전에 정보를 모으고 한숨 돌리는 시간을 두면 좋아요.' },
+  study: { wood: '새로운 분야 입문서를 하나씩 읽어 보며 호기심을 키우면 좋아요.', fire: '소리 내어 읽기·발표 같은 활기 있는 방식을 섞어 보면 좋아요.', earth: '매일 같은 시간에 앉는 습관으로 기초를 다져 보면 좋아요.', metal: '계획에 마감을 두고 요점을 추려 정리하는 연습이 도움이 돼요.', water: '읽은 뒤 한 번 쉬며 생각을 가라앉히는 사색 시간을 두면 좋아요.' },
+};
+const SEASON: Record<string, string> = { 寅: '봄', 卯: '봄', 辰: '늦봄', 巳: '초여름', 午: '여름', 未: '늦여름', 申: '초가을', 酉: '가을', 戌: '늦가을', 亥: '초겨울', 子: '겨울', 丑: '늦겨울' };
+const EXTRA_TIP: Record<Topic, string> = {
+  children: '하루 중 좋았던 순간을 아이와 한 가지씩 이야기해 보세요.',
+  spouse: '한 주에 한 번, 서로 고마웠던 일을 말로 나눠 보세요.',
+  money: '월말에 한 달 지출 중 만족도가 높았던 것과 낮았던 것을 하나씩 꼽아 보세요.',
+  work: '한 주 업무 중 에너지가 오른 일과 빠진 일을 기록해 패턴을 찾아보세요.',
+  study: '한 달에 한 번, 배운 것을 한 장으로 돌아보며 다음 달 주제를 정해 보세요.',
+};
 const lv = (n: number): Lv => (n >= 3 ? 'high' : n === 2 ? 'mid' : 'low');
 const iga = (w: string) => { const c = w.charCodeAt(w.length - 1); return c >= 0xac00 && c <= 0xd7a3 && (c - 0xac00) % 28 === 0 ? '가' : '이'; };
 const topic = (w: string) => { const c = w.charCodeAt(w.length - 1); return c >= 0xac00 && c <= 0xd7a3 && (c - 0xac00) % 28 === 0 ? '는' : '은'; };
@@ -166,6 +197,17 @@ export function ruleInterpret(chart: Chart, gender: 'female' | 'male' | null): A
   const img = `${info.image}처럼 ${info.trait} 기질`;
   const zero = (Object.keys(chart.elements) as (keyof typeof chart.elements)[]).filter(k => chart.elements[k] === 0);
 
+  const dayEl = ds[1];
+  const [minEl, minN] = (Object.keys(chart.elements) as Element[]).map(k => [k, chart.elements[k]] as [Element, number]).reduce((b, c) => (c[1] < b[1] ? c : b));
+  const elemFor = (t: Topic) => minN >= 2
+    ? '오행이 고르게 갖춰져 있어 한쪽에 치우치지 않고 다양한 방식을 시도해 볼 수 있어요.'
+    : `${EL_KO[minEl]}(${EL_HAN[minEl]}) 기운이 ${minN === 0 ? '비어 있어' : '적은 편이라'} ${ELEM_TOPIC[t][minEl]}`;
+  const stemLine = (t: Topic) => STEM_TOPIC[chart.dayStem][t];
+  const mb = chart.pillars[2].branch, mbEl = BRANCH[mb][1];
+  const deukryeong = mbEl === dayEl || GEN[mbEl] === dayEl;
+  const seasonSentence = `월지 ${mb}(${SEASON[mb]})에서 일간 ${EL_KO[dayEl]}(${EL_HAN[dayEl]})${iga(EL_KO[dayEl])} ${deukryeong ? '힘을 얻는(득령) 편이라 기운이 든든해요.' : '힘을 덜 받는 편이라 주변의 도움과 준비가 더 중요해요.'}`;
+  const dg = chart.curDaeun ? tenGod(chart.dayStem, chart.curDaeun[0]) : null;
+  const daeunLine = dg && chart.curDaeun ? `지금 지나는 ${chart.curDaeun} 대운의 천간은 일간 기준 ${dg}${iga(dg)}라 ${tr(dg)} 부각되기 쉬운 시기로 읽을 수 있어요.` : '';
   const childG: Group = gender === 'male' ? '관성' : '식상';
   const spouseG: Group = gender === 'female' ? '관성' : gender === 'male' ? '재성' : GROUP[a.dayBranchGod ?? ''] ?? '재성';
 
@@ -193,15 +235,15 @@ export function ruleInterpret(chart: Chart, gender: 'female' | 'male' | null): A
   return {
     summary: `${info.image} 같은 일간에 ${GROUP_WORD[a.dominant]}${iga(GROUP_WORD[a.dominant])} 돋보이는 사주예요.`,
     keywords,
-    children: { summary: children.summary, body: [`${ev(childG)} 이 기운은 ${childEv}기운이에요.`, children.s2, timeSentence + childRel, `${img}이 아이와의 관계에서도 은연중에 드러나요.`], tips: children.tips, details: [{ label: '소통에서의 강점', text: children.d[0] }, { label: '신경 쓰면 좋은 점', text: children.d[1] }] },
-    spouse: { summary: spouse.summary, body: [`${ev(spouseG)} 관계를 대하는 태도는 아래와 같이 읽을 수 있어요.`, spouse.s2, [spouseSentence, spouseRel].filter(Boolean).join(' '), '결혼이나 인연의 시기는 사주만으로 정할 수 없고, 이 풀이는 관계를 대하는 성향을 참고하는 용도예요.'].filter(Boolean), tips: spouse.tips, details: [{ label: '잘 맞을 수 있는 상대', text: spouse.d[0] }, { label: '관계에서 주의할 점', text: spouse.d[1] }] },
-    money: { summary: money.summary, body: [`${ev('재성')} 돈을 대하는 성향은 아래와 같아요.`, money.s2, strengthSent, bigeopNote], tips: money.tips, details: [{ label: '재정 관리에서의 강점', text: money.d[0] }, { label: '소비할 때 주의할 습관', text: money.d[1] }] },
-    work: { summary: work.summary, body: [`${img}에, 십신 중 ${GROUP_LABEL[a.dominant]}${iga(GROUP_LABEL[a.dominant])} 가장 두드러져요.`, work.s2, [monthSentence, workRel].filter(Boolean).join(' '), elemSentence].filter(Boolean), tips: work.tips, details: [{ label: '직무를 탐색할 때 참고할 성향', text: work.d[0] }, { label: '이직이나 새로운 도전 전 점검할 것', text: work.d[1] }] },
+    children: { summary: children.summary, body: [`${ev(childG)} 이 기운은 ${childEv}기운이에요.`, children.s2, timeSentence + childRel, `${img}이 아이와의 관계에서도 은연중에 드러나요.`], tips: [...children.tips, EXTRA_TIP.children], details: [{ label: '소통에서의 강점', text: children.d[0] }, { label: '신경 쓰면 좋은 점', text: children.d[1] }, { label: '오행으로 보는 균형', text: elemFor('children') }, { label: `일간 ${chart.dayStem}의 한마디`, text: stemLine('children') }] },
+    spouse: { summary: spouse.summary, body: [`${ev(spouseG)} 관계를 대하는 태도는 아래와 같이 읽을 수 있어요.`, spouse.s2, [spouseSentence, spouseRel].filter(Boolean).join(' '), '결혼이나 인연의 시기는 사주만으로 정할 수 없고, 이 풀이는 관계를 대하는 성향을 참고하는 용도예요.'].filter(Boolean), tips: [...spouse.tips, EXTRA_TIP.spouse], details: [{ label: '잘 맞을 수 있는 상대', text: spouse.d[0] }, { label: '관계에서 주의할 점', text: spouse.d[1] }, { label: '오행으로 보는 균형', text: elemFor('spouse') }, { label: `일간 ${chart.dayStem}의 한마디`, text: stemLine('spouse') }] },
+    money: { summary: money.summary, body: [`${ev('재성')} 돈을 대하는 성향은 아래와 같아요.`, money.s2, strengthSent, bigeopNote, seasonSentence, daeunLine].filter(Boolean), tips: [...money.tips, EXTRA_TIP.money], details: [{ label: '재정 관리에서의 강점', text: money.d[0] }, { label: '소비할 때 주의할 습관', text: money.d[1] }, { label: '오행으로 보는 균형', text: elemFor('money') }, { label: `일간 ${chart.dayStem}의 한마디`, text: stemLine('money') }] },
+    work: { summary: work.summary, body: [`${img}에, 십신 중 ${GROUP_LABEL[a.dominant]}${iga(GROUP_LABEL[a.dominant])} 가장 두드러져요.`, work.s2, [monthSentence, workRel].filter(Boolean).join(' '), seasonSentence, daeunLine].filter(Boolean), tips: [...work.tips, EXTRA_TIP.work], details: [{ label: '직무를 탐색할 때 참고할 성향', text: work.d[0] }, { label: '이직이나 새로운 도전 전 점검할 것', text: work.d[1] }, { label: '오행으로 보는 균형', text: elemFor('work') }, { label: `일간 ${chart.dayStem}의 한마디`, text: stemLine('work') }] },
     study: {
       summary: `${study.summary.replace(/요\.$/, '요.')} 고전과 새로운 학문에 도전하면 좋아요.`,
-      body: [`${ev('인성')} 학습 성향을 이렇게 볼 수 있어요.`, study.s2, ch.s, `${a.monthGod ? `월지에 ${a.monthGod}${iga(a.monthGod)} 있어 공부에서도 ${tr(a.monthGod)} 힘이 돼요.` : ''}`].filter(Boolean),
-      tips: [...study.tips.slice(0, 2), ch.tip],
-      details: [{ label: '집중에 도움이 되는 환경', text: `${info.env}에서 집중이 잘 되는 기질이에요. ${study.d[0]}` }, { label: '주의할 습관', text: study.d[1] }],
+      body: [`${ev('인성')} 학습 성향을 이렇게 볼 수 있어요.`, study.s2, ch.s, `${a.monthGod ? `월지에 ${a.monthGod}${iga(a.monthGod)} 있어 공부에서도 ${tr(a.monthGod)} 힘이 돼요.` : ''}`, seasonSentence, daeunLine].filter(Boolean),
+      tips: [...study.tips.slice(0, 2), ch.tip, EXTRA_TIP.study],
+      details: [{ label: '집중에 도움이 되는 환경', text: `${info.env}에서 집중이 잘 되는 기질이에요. ${study.d[0]}` }, { label: '주의할 습관', text: study.d[1] }, { label: '오행으로 보는 균형', text: elemFor('study') }, { label: `일간 ${chart.dayStem}의 한마디`, text: stemLine('study') }],
     },
   };
 }

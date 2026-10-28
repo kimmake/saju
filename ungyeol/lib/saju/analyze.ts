@@ -9,7 +9,7 @@ import type { AnalyzeResult, FortuneSection, SajuInput, Section } from './types'
 function fortuneSection(f: FortuneSpec, ai: AiJson | null): FortuneSection {
   const s = ai && ai[f.id];
   return s
-    ? { id: f.id, type: 'fortune', title: f.title, icon: f.icon, summary: s.summary, body: s.body.slice(0, 5), tips: (s.tips || []).slice(0, f.tips), details: (s.details || []).slice(0, 2) }
+    ? { id: f.id, type: 'fortune', title: f.title, icon: f.icon, summary: s.summary, body: s.body.slice(0, 7), tips: (s.tips || []).slice(0, f.tips), details: (s.details || []).slice(0, 4) }
     : { id: f.id, type: 'fortune', title: f.title, icon: f.icon, summary: '해석 문장을 불러오지 못했어요.', body: ['명식 계산은 끝났지만 해석 문장을 만드는 중에 문제가 생겼어요. 위쪽의 ‘해석 다시 불러오기’를 눌러 주세요.'], tips: [], details: [] };
 }
 
