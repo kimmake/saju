@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Nanum+Myeongjo:wght@400;700;800&display=swap" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/lunar-javascript@1.7.3/lunar.js"></script>
+<script src="saju-data.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/html-to-image@1.11.11/dist/html-to-image.js"></script>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<style>
+html{scroll-behavior:auto}
+body{margin:0;word-break:keep-all;background-color:#EFE6D3;color:#24211D;font-family:Pretendard,'Noto Sans KR',system-ui,sans-serif;-webkit-font-smoothing:antialiased;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .45 0 0 0 0 .38 0 0 0 0 .28 0 0 0 .07 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+a{color:#574A86}a:hover{color:#3E3366}
+*{box-sizing:border-box}
+input,select,button{font-family:inherit}
+:focus-visible{outline:3px solid #8A7BC0;outline-offset:2px}
+@keyframes ukSpin{to{transform:rotate(360deg)}}
+@keyframes ukTwinkle{0%,100%{opacity:.25}50%{opacity:1}}
+@keyframes ukBreath{0%,100%{transform:scale(.94);opacity:.7}50%{transform:scale(1);opacity:1}}
+@keyframes ukFade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+</style>
+</helmet>
+<div style="min-height:100vh;display:flex;flex-direction:column;position:relative;isolation:isolate">
+<div aria-hidden="true" style="position:fixed;inset:0;z-index:-1;pointer-events:none;overflow:hidden;background:radial-gradient(ellipse 40% 30% at 18% 22%,rgba(160,120,60,.10),transparent 70%),radial-gradient(ellipse 35% 25% at 82% 68%,rgba(150,110,55,.10),transparent 70%),radial-gradient(ellipse 25% 20% at 60% 12%,rgba(120,90,50,.07),transparent 70%),radial-gradient(ellipse 30% 22% at 35% 80%,rgba(140,100,50,.08),transparent 70%),radial-gradient(ellipse 120% 90% at 50% 45%,transparent 55%,rgba(110,80,40,.22) 100%)">
+  <svg width="0" height="0" style="position:absolute">
+    <defs>
+      <filter id="ukInk" x="-10%" y="-10%" width="120%" height="120%"><feTurbulence type="fractalNoise" baseFrequency="0.018 0.05" numOctaves="4" seed="7" result="t"></feTurbulence><feDisplacementMap in="SourceGraphic" in2="t" scale="38" xChannelSelector="R" yChannelSelector="G" result="d"></feDisplacementMap><feGaussianBlur in="d" stdDeviation="1.6"></feGaussianBlur></filter>
+      <filter id="ukInkSoft" x="-10%" y="-10%" width="120%" height="120%"><feTurbulence type="fractalNoise" baseFrequency="0.012 0.03" numOctaves="3" seed="3" result="t"></feTurbulence><feDisplacementMap in="SourceGraphic" in2="t" scale="30" xChannelSelector="R" yChannelSelector="G" result="d"></feDisplacementMap><feGaussianBlur in="d" stdDeviation="4"></feGaussianBlur></filter>
+      <linearGradient id="ukMist1" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#8E897F" stop-opacity=".55"></stop><stop offset=".75" stop-color="#8E897F" stop-opacity="0"></stop></linearGradient>
+      <linearGradient id="ukMist2" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#5F5A52" stop-opacity=".6"></stop><stop offset=".7" stop-color="#5F5A52" stop-opacity="0"></stop></linearGradient>
+      <linearGradient id="ukMist3" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#36332E" stop-opacity=".55"></stop><stop offset=".65" stop-color="#36332E" stop-opacity="0"></stop></linearGradient>
+    </defs>
+  </svg>
+  <svg viewBox="0 0 600 500" preserveAspectRatio="xMinYMax meet" style="position:absolute;left:0;bottom:0;width:min(48vw,680px);height:auto;opacity:.75">
+    <path filter="url(#ukInkSoft)" fill="url(#ukMist1)" d="M-20 500 L-20 170 L50 110 L100 160 L170 70 L235 150 L300 120 L380 220 L470 250 L620 330 L620 500Z"></path>
+    <path filter="url(#ukInk)" fill="url(#ukMist2)" d="M-20 500 L-20 250 L45 220 L90 160 L145 240 L205 200 L265 275 L335 295 L425 355 L525 395 L620 430 L620 500Z"></path>
+    <path filter="url(#ukInk)" fill="url(#ukMist3)" d="M-20 500 L-20 320 L35 290 L70 230 L115 310 L175 345 L245 395 L335 440 L430 470 L620 500Z"></path>
+  </svg>
+  <svg viewBox="0 0 600 500" preserveAspectRatio="xMaxYMax meet" style="position:absolute;right:0;bottom:0;width:min(44vw,620px);height:auto;opacity:.7;transform:scaleX(-1)">
+    <path filter="url(#ukInkSoft)" fill="url(#ukMist1)" d="M-20 500 L-20 200 L70 140 L130 190 L200 100 L260 170 L330 150 L410 240 L500 270 L620 340 L620 500Z"></path>
+    <path filter="url(#ukInk)" fill="url(#ukMist2)" d="M-20 500 L-20 280 L60 230 L110 190 L160 260 L230 230 L290 300 L370 320 L460 380 L620 440 L620 500Z"></path>
+    <path filter="url(#ukInk)" fill="url(#ukMist3)" d="M-20 500 L-20 350 L50 310 L90 270 L140 340 L210 380 L300 430 L420 470 L620 500Z"></path>
+  </svg>
+  <svg viewBox="0 0 220 80" style="position:absolute;left:-40px;top:64px;width:170px;opacity:.4" fill="none" stroke="#9C8458" stroke-width="1.3" stroke-linecap="round">
+    <path d="M6 40 H120 a16 16 0 1 0 -16 -16 a9 9 0 1 1 9 9"></path>
+    <path d="M40 58 H190 a12 12 0 1 0 -12 -12 a7 7 0 1 1 7 7"></path>
+  </svg>
+  <svg viewBox="0 0 220 80" style="position:absolute;right:2vw;top:300px;width:180px;opacity:.5;transform:scaleX(-1)" fill="none" stroke="#9C8458" stroke-width="1.3" stroke-linecap="round">
+    <path d="M6 40 H120 a16 16 0 1 0 -16 -16 a9 9 0 1 1 9 9"></path>
+    <path d="M40 58 H190 a12 12 0 1 0 -12 -12 a7 7 0 1 1 7 7"></path>
+  </svg>
+  <svg viewBox="0 0 90 90" style="position:absolute;right:4px;top:4px;width:36px;opacity:.5" fill="none" stroke="#9C8458" stroke-width="1.4">
+    <path d="M0 4 H86 V90"></path><path d="M30 12 H78 V60"></path><path d="M54 12 V36 H78"></path>
+  </svg>
+  <svg viewBox="0 0 90 90" style="position:absolute;left:6px;bottom:6px;width:56px;opacity:.5;transform:rotate(180deg)" fill="none" stroke="#9C8458" stroke-width="1.4">
+    <path d="M0 4 H86 V90"></path><path d="M30 12 H78 V60"></path><path d="M54 12 V36 H78"></path>
+  </svg>
+</div>
+
+<header style="position:relative;z-index:1;width:100%;max-width:1160px;margin:0 auto;padding:clamp(14px,3vw,22px) clamp(16px,4vw,24px);display:flex;align-items:center;justify-content:space-between;gap:16px">
+  <button onClick="{{ goHome }}" aria-label="운결 처음 화면으로" style="display:flex;align-items:baseline;gap:10px;background:none;border:0;padding:4px;cursor:pointer;color:#24211D">
+    <span style="font-family:'Nanum Myeongjo',serif;font-weight:800;font-size:26px;letter-spacing:-0.02em">운결</span>
+    <span style="font-family:'Nanum Myeongjo',serif;font-size:14px;color:#7D5F24;letter-spacing:0.2em">運結</span>
+  </button>
+</header>
+
+<sc-if value="{{ isInput }}" hint-placeholder-val="{{ true }}">
+<main style="width:100%;max-width:1160px;margin:0 auto;padding:clamp(8px,3vw,24px) clamp(16px,4vw,24px) 72px;display:flex;flex-wrap:wrap;gap:clamp(28px,6vw,56px);align-items:flex-start">
+  <div style="flex:1 1 320px;min-width:0;position:relative;padding-top:clamp(12px,3vw,28px)">
+    <svg width="220" height="120" viewBox="0 0 220 120" aria-hidden="true" style="position:absolute;right:0;top:0;opacity:.8">
+      <g stroke="#B79A5E" stroke-width="0.8" fill="none" opacity=".7"><line x1="20" y1="90" x2="70" y2="58"></line><line x1="70" y1="58" x2="118" y2="70"></line><line x1="118" y1="70" x2="160" y2="30"></line><line x1="160" y1="30" x2="204" y2="46"></line></g>
+      <g fill="#A8833F"><circle cx="20" cy="90" r="2.4"></circle><circle cx="70" cy="58" r="3"></circle><circle cx="118" cy="70" r="2"></circle><circle cx="160" cy="30" r="3.4"></circle><circle cx="204" cy="46" r="2.2"></circle></g>
+    </svg>
+    <p style="margin:0 0 20px;font-size:14px;color:#574A86;font-weight:600;letter-spacing:0.02em">나의 운을 읽고, 좋은 인연을 연결하다</p>
+    <h1 style="margin:0;font-family:'Nanum Myeongjo',serif;font-weight:800;font-size:clamp(34px,4.6vw,54px);line-height:1.28;letter-spacing:-0.03em;text-wrap:balance">당신의 사주에 담긴 이야기를 만나보세요.</h1>
+    <svg width="168" height="18" viewBox="0 0 168 18" aria-hidden="true" style="display:block;margin:22px 0 20px"><path d="M2 12 Q 22 2 42 10 T 82 10 T 122 10 T 166 8" stroke="#A8833F" stroke-width="1.4" fill="none" stroke-linecap="round"></path></svg>
+    <p style="margin:0;font-size:18px;line-height:1.7;color:#4A453E;max-width:440px">타고난 기질부터 관계, 재물, 공부와 일의 흐름까지.</p>
+    <div style="margin-top:clamp(24px,5vw,40px);padding:clamp(16px,4vw,22px) clamp(16px,4vw,24px);border-radius:20px;background:rgba(251,248,242,.6);border:1px solid rgba(36,33,29,.08);max-width:460px">
+      <p style="margin:0 0 12px;font-size:13px;font-weight:600;color:#6B645A">결과에서 살펴볼 일곱 가지 이야기</p>
+      <div style="display:flex;flex-wrap:wrap;gap:8px">
+        <sc-for list="{{ previewTopics }}" as="t" hint-placeholder-count="7">
+          <span style="white-space:nowrap;font-size:14px;padding:6px 12px;border-radius:999px;background:#FBF8F2;border:1px solid rgba(36,33,29,.1);color:#3A352F">{{ t }}</span>
+        </sc-for>
+      </div>
+    </div>
+  </div>
+
+  <form onSubmit="{{ submit }}" noValidate="{{ true }}" style="flex:1 1 340px;max-width:540px;min-width:0;background:#FBF8F2;border:1px solid rgba(36,33,29,.1);border-radius:28px;padding:clamp(22px,4vw,36px);box-shadow:0 1px 0 rgba(255,255,255,.8) inset,0 24px 48px -28px rgba(60,45,20,.25);display:flex;flex-direction:column;gap:26px">
+    <div style="display:flex;flex-direction:column;gap:6px">
+      <h2 style="margin:0;font-family:'Nanum Myeongjo',serif;font-size:24px;font-weight:800">출생 정보 입력</h2>
+      <p style="margin:0;font-size:14px;color:#6B645A;line-height:1.6">정확할수록 해석이 구체적이에요. 모르는 항목은 비워 두셔도 괜찮아요.</p>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <label for="f-name" style="font-size:15px;font-weight:600;display:flex;gap:8px;align-items:center">이름 또는 별명 <span style="font-size:12px;font-weight:500;color:#6B645A;padding:2px 8px;border-radius:999px;background:#EFEADF">선택</span></label>
+      <input id="f-name" value="{{ form.name }}" onChange="{{ h.name }}" maxLength="12" placeholder="예: 하늘" autoComplete="nickname" style="height:52px;border-radius:14px;border:1px solid rgba(36,33,29,.18);background:#fff;padding:0 16px;font-size:16px;color:#24211D">
+      <p style="margin:0;font-size:13px;color:#6B645A">결과 제목에 “○○님의 사주 이야기”로 표시돼요.</p>
+    </div>
+
+    <fieldset style="border:0;margin:0;padding:0;display:flex;flex-direction:column;gap:10px">
+      <legend style="font-size:15px;font-weight:600;padding:0;margin-bottom:10px">생년월일</legend>
+      <div role="radiogroup" aria-label="달력 기준" style="display:grid;grid-template-columns:1fr 1fr;gap:4px;padding:4px;border-radius:14px;background:#EFEADF">
+        <button type="button" role="radio" aria-checked="{{ cal.solar }}" onClick="{{ h.solar }}" style="height:42px;border:0;border-radius:11px;font-size:15px;font-weight:600;cursor:pointer;background:{{ cal.solarBg }};color:{{ cal.solarFg }};box-shadow:{{ cal.solarSh }}">양력</button>
+        <button type="button" role="radio" aria-checked="{{ cal.lunar }}" onClick="{{ h.lunar }}" style="height:42px;border:0;border-radius:11px;font-size:15px;font-weight:600;cursor:pointer;background:{{ cal.lunarBg }};color:{{ cal.lunarFg }};box-shadow:{{ cal.lunarSh }}">음력</button>
+      </div>
+      <div style="display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr) minmax(0,1fr);gap:8px">
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <label for="f-year" style="font-size:13px;color:#4A453E">연</label>
+          <input id="f-year" inputMode="numeric" value="{{ form.year }}" onChange="{{ h.year }}" onBlur="{{ b.year }}" placeholder="예: 1994" aria-invalid="{{ show.year }}" aria-describedby="e-date" style="height:52px;border-radius:14px;border:1px solid {{ bc.year }};background:#fff;padding:0 14px;font-size:16px;color:#24211D;min-width:0">
+        </div>
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <label for="f-month" style="font-size:13px;color:#4A453E">월</label>
+          <input id="f-month" inputMode="numeric" value="{{ form.month }}" onChange="{{ h.month }}" onBlur="{{ b.month }}" placeholder="3" aria-invalid="{{ show.month }}" aria-describedby="e-date" style="height:52px;border-radius:14px;border:1px solid {{ bc.month }};background:#fff;padding:0 14px;font-size:16px;color:#24211D;min-width:0">
+        </div>
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <label for="f-day" style="font-size:13px;color:#4A453E">일</label>
+          <input id="f-day" inputMode="numeric" value="{{ form.day }}" onChange="{{ h.day }}" onBlur="{{ b.day }}" placeholder="12" aria-invalid="{{ show.day }}" aria-describedby="e-date" style="height:52px;border-radius:14px;border:1px solid {{ bc.day }};background:#fff;padding:0 14px;font-size:16px;color:#24211D;min-width:0">
+        </div>
+      </div>
+      <div id="e-date" aria-live="polite" style="display:flex;flex-direction:column;gap:4px">
+        <sc-for list="{{ dateErrors }}" as="er" hint-placeholder-count="0">
+          <p style="margin:0;font-size:13.5px;color:#A33A2A;font-weight:500">{{ er }}</p>
+        </sc-for>
+      </div>
+      <sc-if value="{{ isLunar }}" hint-placeholder-val="{{ false }}">
+        <label style="display:flex;align-items:center;gap:10px;font-size:15px;cursor:pointer;padding:12px 14px;border-radius:14px;background:#F2EEF7">
+          <input type="checkbox" checked="{{ form.leap }}" onChange="{{ h.leap }}" style="width:20px;height:20px;accent-color:#574A86;margin:0">
+          윤달에 태어났어요
+        </label>
+      </sc-if>
+      <sc-if value="{{ showIpchunHint }}" hint-placeholder-val="{{ false }}">
+        <p style="margin:0;font-size:13.5px;line-height:1.6;color:#5C4A1F;padding:10px 14px;border-radius:12px;background:#F3EAD6">입춘(2월 4일 전후) 이전 출생이라면 띠는 전년도 기준으로 볼 수 있어요. 실제 분석에서는 절기 시각으로 확인해요.</p>
+      </sc-if>
+    </fieldset>
+
+    <fieldset style="border:0;margin:0;padding:0;display:flex;flex-direction:column;gap:10px">
+      <legend style="font-size:15px;font-weight:600;padding:0;margin-bottom:10px">태어난 시간</legend>
+      <div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:8px;opacity:{{ timeOpacity }}">
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <label for="f-hour" style="font-size:13px;color:#4A453E">시 (0–23)</label>
+          <input id="f-hour" inputMode="numeric" value="{{ form.hour }}" onChange="{{ h.hour }}" onBlur="{{ b.hour }}" disabled="{{ form.timeUnknown }}" placeholder="예: 15" aria-invalid="{{ show.hour }}" aria-describedby="e-time" style="height:52px;border-radius:14px;border:1px solid {{ bc.hour }};background:#fff;padding:0 14px;font-size:16px;color:#24211D;min-width:0">
+        </div>
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <label for="f-minute" style="font-size:13px;color:#4A453E">분 (0–59)</label>
+          <input id="f-minute" inputMode="numeric" value="{{ form.minute }}" onChange="{{ h.minute }}" onBlur="{{ b.minute }}" disabled="{{ form.timeUnknown }}" placeholder="예: 20" aria-invalid="{{ show.minute }}" aria-describedby="e-time" style="height:52px;border-radius:14px;border:1px solid {{ bc.minute }};background:#fff;padding:0 14px;font-size:16px;color:#24211D;min-width:0">
+        </div>
+      </div>
+      <p style="margin:0;font-size:13px;color:#6B645A">24시간 기준이에요. 오후 3시 20분은 15시 20분으로 입력해 주세요.</p>
+      <div id="e-time" aria-live="polite" style="display:flex;flex-direction:column;gap:4px">
+        <sc-for list="{{ timeErrors }}" as="er" hint-placeholder-count="0">
+          <p style="margin:0;font-size:13.5px;color:#A33A2A;font-weight:500">{{ er }}</p>
+        </sc-for>
+      </div>
+      <label style="display:flex;align-items:center;gap:10px;font-size:15px;cursor:pointer;padding:12px 14px;border-radius:14px;background:#EFEADF">
+        <input type="checkbox" checked="{{ form.timeUnknown }}" onChange="{{ h.timeUnknown }}" style="width:20px;height:20px;accent-color:#574A86;margin:0">
+        시간 모름
+      </label>
+      <sc-if value="{{ form.timeUnknown }}" hint-placeholder-val="{{ false }}">
+        <p style="margin:0;font-size:13.5px;line-height:1.6;color:#3E3366;padding:10px 14px;border-radius:12px;background:#ECE8F3">태어난 시간을 모르면 일부 해석의 구체성이 낮아질 수 있어요. 시간 없이도 결과를 확인할 수 있어요.</p>
+      </sc-if>
+    </fieldset>
+
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <span style="font-size:15px;font-weight:600">출생 지역</span>
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;height:52px;border-radius:14px;border:1px solid rgba(36,33,29,.12);background:#F4F0E8;padding:0 16px">
+        <span style="font-size:16px;color:#24211D">대한민국</span>
+        <span style="white-space:nowrap;font-size:12.5px;color:#5A544B">국내 출생 기준</span>
+      </div>
+      <p style="margin:0;font-size:13px;line-height:1.6;color:#6B645A">운결은 국내 출생을 기준으로 해석해요. 실제 태양시(약 −30분)를 반영해 계산해요.</p>
+    </div>
+
+    <sc-if value="{{ showGender }}" hint-placeholder-val="{{ true }}">
+      <fieldset style="border:0;margin:0;padding:0;display:flex;flex-direction:column;gap:10px">
+        <legend style="font-size:15px;font-weight:600;padding:0;margin-bottom:10px">해석에 사용하는 성별</legend>
+        <div role="radiogroup" aria-label="해석에 사용하는 성별" style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px">
+          <sc-for list="{{ genderOpts }}" as="g" hint-placeholder-count="3">
+            <button type="button" role="radio" aria-checked="{{ g.on }}" onClick="{{ g.pick }}" style="height:46px;border-radius:12px;font-size:15px;cursor:pointer;border:1px solid {{ g.bd }};background:{{ g.bg }};color:{{ g.fg }};font-weight:{{ g.fw }}">{{ g.label }}</button>
+          </sc-for>
+        </div>
+        <p style="margin:0;font-size:13px;line-height:1.6;color:#6B645A">전통 명리학에서 10년 단위 흐름(대운)의 방향을 정할 때만 쓰여요. 선택하지 않아도 결과를 볼 수 있고, 이 경우 대운 관련 해석은 제외돼요.</p>
+      </fieldset>
+    </sc-if>
+
+    <div style="display:flex;flex-direction:column;gap:14px;padding-top:4px">
+      <sc-if value="{{ formError }}" hint-placeholder-val="{{ false }}">
+        <p role="alert" style="margin:0;font-size:14px;line-height:1.6;color:#A33A2A;font-weight:500;padding:12px 14px;border-radius:12px;background:#F6E3DE">{{ formError }}</p>
+      </sc-if>
+      <button type="submit" style="height:58px;border:0;border-radius:16px;background:#574A86;color:#fff;font-size:17px;font-weight:700;letter-spacing:-0.01em;cursor:pointer;box-shadow:0 12px 24px -14px rgba(87,74,134,.8)" style-hover="background:#4A3E75">내 사주 살펴보기</button>
+    </div>
+  </form>
+</main>
+</sc-if>
+
+<sc-if value="{{ isLoading }}" hint-placeholder-val="{{ false }}">
+<main aria-live="polite" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:28px;padding:80px 24px 120px;text-align:center">
+  {{ loader }}
+  <div style="display:flex;flex-direction:column;gap:10px;align-items:center">
+    <h2 style="margin:0;font-family:'Nanum Myeongjo',serif;font-size:24px;font-weight:800;line-height:1.5">{{ loadingTitle }}</h2>
+    <p style="margin:0;font-size:15px;color:#6B645A">잠시만 기다려 주세요.</p>
+  </div>
+  <ol style="list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:10px;align-items:flex-start">
+    <sc-for list="{{ loadSteps }}" as="st" hint-placeholder-count="3">
+      <li style="display:flex;align-items:center;gap:10px;font-size:15px;color:{{ st.color }};font-weight:{{ st.fw }}"><span aria-hidden="true" style="width:8px;height:8px;transform:rotate(45deg);background:{{ st.dot }}"></span>{{ st.label }}</li>
+    </sc-for>
+  </ol>
+</main>
+</sc-if>
+
+<sc-if value="{{ isResult }}" hint-placeholder-val="{{ false }}">
+<main style="width:100%;max-width:1160px;margin:0 auto;padding:8px clamp(16px,4vw,24px) 64px;display:flex;flex-direction:column;gap:clamp(20px,4vw,28px)">
+  <div role="status" style="display:flex;flex-wrap:wrap;align-items:center;gap:10px 14px;padding:14px 18px;border-radius:16px;background:#ECE8F3;border:1px solid rgba(87,74,134,.2)">
+    <span style="white-space:nowrap;flex:none;font-size:14px;font-weight:700;color:#fff;background:#574A86;padding:5px 12px;border-radius:999px">{{ result.meta.label }}</span>
+    <span style="font-size:14px;color:#3E3366;line-height:1.55;flex:1 1 280px">{{ result.meta.note }}</span>
+    <sc-if value="{{ result.meta.interpFailed }}" hint-placeholder-val="{{ false }}">
+      <button onClick="{{ retry }}" style="white-space:nowrap;flex:none;height:40px;padding:0 16px;border-radius:999px;border:0;background:#574A86;color:#fff;font-size:14px;font-weight:600;cursor:pointer">해석 다시 불러오기</button>
+    </sc-if>
+  </div>
+
+  <section aria-labelledby="r-title" style="position:relative;overflow:hidden;background:#FBF8F2;border:1px solid rgba(36,33,29,.1);border-radius:32px;padding:clamp(24px,5vw,48px);display:flex;flex-direction:column;gap:22px;box-shadow:0 24px 48px -32px rgba(60,45,20,.3)">
+    <svg width="260" height="140" viewBox="0 0 260 140" aria-hidden="true" style="position:absolute;right:-10px;top:-6px;opacity:.55">
+      <g stroke="#B79A5E" stroke-width="0.8" fill="none"><line x1="30" y1="110" x2="90" y2="70"></line><line x1="90" y1="70" x2="150" y2="88"></line><line x1="150" y1="88" x2="200" y2="40"></line><line x1="200" y1="40" x2="244" y2="64"></line></g>
+      <g fill="#A8833F"><circle cx="30" cy="110" r="2.4"></circle><circle cx="90" cy="70" r="3"></circle><circle cx="150" cy="88" r="2"></circle><circle cx="200" cy="40" r="3.6"></circle><circle cx="244" cy="64" r="2.2"></circle></g>
+    </svg>
+    <div style="display:flex;flex-direction:column;gap:12px;position:relative">
+      <h1 id="r-title" style="margin:0;font-family:'Nanum Myeongjo',serif;font-weight:800;font-size:clamp(28px,4vw,42px);letter-spacing:-0.03em;line-height:1.3">{{ resultTitle }}</h1>
+      <div style="display:flex;flex-wrap:wrap;align-items:center;gap:10px 14px">
+        <span style="font-size:15px;color:#4A453E;line-height:1.6">{{ birthLine }}</span>
+        <span style="white-space:nowrap;font-size:14px;font-weight:600;color:#7D5F24">{{ result.identity }}</span>
+        <button onClick="{{ editInfo }}" style="white-space:nowrap;flex:none;height:40px;padding:0 14px;border-radius:999px;border:1px solid rgba(87,74,134,.4);background:transparent;color:#574A86;font-size:14px;font-weight:600;cursor:pointer" style-hover="background:#ECE8F3">정보 수정</button>
+      </div>
+    </div>
+    <p style="margin:0;font-family:'Nanum Myeongjo',serif;font-size:clamp(19px,2.4vw,24px);line-height:1.7;color:#2E2A25;max-width:720px;text-wrap:pretty;position:relative">“{{ result.summary }}”</p>
+    <div style="display:flex;flex-wrap:wrap;gap:8px;position:relative">
+      <sc-for list="{{ result.keywords }}" as="k" hint-placeholder-count="3">
+        <span style="white-space:nowrap;font-size:15px;font-weight:600;padding:8px 16px;border-radius:999px;background:#F3EAD6;color:#5C4A1F;border:1px solid rgba(168,131,63,.3)"># {{ k }}</span>
+      </sc-for>
+    </div>
+    <div style="display:flex;flex-wrap:wrap;gap:10px;padding-top:6px;border-top:1px dashed rgba(36,33,29,.14);position:relative">
+      <button onClick="{{ restart }}" style="white-space:nowrap;flex:none;height:46px;padding:0 20px;border-radius:14px;border:0;background:#24211D;color:#FBF8F2;font-size:15px;font-weight:600;cursor:pointer;margin-top:14px">다시 입력하기</button>
+      <button onClick="{{ saveImage }}" aria-busy="{{ saving }}" style="white-space:nowrap;flex:none;height:46px;padding:0 18px;border-radius:14px;border:1px solid #574A86;background:#574A86;color:#fff;font-size:15px;font-weight:600;cursor:pointer;margin-top:14px;opacity:{{ saveOpacity }}" style-hover="background:#4A3E75">{{ saveLabel }}</button>
+    </div>
+    <p aria-live="polite" style="margin:-8px 0 0;font-size:13.5px;line-height:1.6;color:{{ saveMsgColor }};position:relative">{{ saveMsg }}</p>
+  </section>
+
+  <section aria-label="사주팔자와 오행 분포 요약" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,340px),1fr));gap:20px">
+    <div style="background:#FBF8F2;border:1px solid rgba(36,33,29,.1);border-radius:24px;padding:clamp(18px,4vw,26px);display:flex;flex-direction:column;gap:18px">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap">
+        <h2 style="margin:0;font-family:'Nanum Myeongjo',serif;font-size:20px;font-weight:800">사주팔자</h2>
+        <span style="white-space:nowrap;font-size:12.5px;font-weight:600;padding:4px 10px;border-radius:999px;border:1px solid rgba(87,74,134,.5);color:#574A86">{{ result.meta.chartTag }}</span>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px">
+        <sc-for list="{{ pillars }}" as="p" hint-placeholder-count="4">
+          <div style="display:flex;flex-direction:column;align-items:center;gap:6px;padding:12px 4px;border-radius:16px;background:{{ p.bg }};border:1px solid {{ p.bd }}">
+            <span style="font-size:13px;font-weight:600;color:#3A352F">{{ p.label }}</span>
+            <span style="font-family:'Nanum Myeongjo',serif;font-size:30px;font-weight:800;line-height:1.1;color:{{ p.stemColor }}">{{ p.stem }}</span>
+            <span style="font-size:12px;color:#5A544B;text-align:center">{{ p.stemCap }}</span>
+            <span style="font-size:11.5px;color:#7D5F24;font-weight:600">{{ p.stemGod }}</span>
+            <span style="width:60%;height:1px;background:rgba(36,33,29,.12)"></span>
+            <span style="font-family:'Nanum Myeongjo',serif;font-size:30px;font-weight:800;line-height:1.1;color:{{ p.branchColor }}">{{ p.branch }}</span>
+            <span style="font-size:12px;color:#5A544B">{{ p.branchCap }}</span>
+            <span style="font-size:11.5px;color:#7D5F24;font-weight:600">{{ p.branchGod }}</span>
+          </div>
+        </sc-for>
+      </div>
+      <p style="margin:0;font-size:13.5px;color:#5A544B;line-height:1.6">{{ result.chartNote }}</p>
+      <sc-if value="{{ result.daeun }}" hint-placeholder-val="{{ false }}">
+        <p style="margin:0;font-size:13.5px;line-height:1.6;color:#3E3366;padding:10px 14px;border-radius:12px;background:#ECE8F3">{{ result.daeun }}</p>
+      </sc-if>
+    </div>
+    <div style="background:#FBF8F2;border:1px solid rgba(36,33,29,.1);border-radius:24px;padding:clamp(18px,4vw,26px);display:flex;flex-direction:column;gap:18px">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap">
+        <h2 style="margin:0;font-family:'Nanum Myeongjo',serif;font-size:20px;font-weight:800">오행 분포</h2>
+        <span style="white-space:nowrap;font-size:12.5px;font-weight:600;padding:4px 10px;border-radius:999px;border:1px solid rgba(87,74,134,.5);color:#574A86">{{ result.meta.chartTag }}</span>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <sc-for list="{{ elementRows }}" as="e" hint-placeholder-count="5">
+          <div style="display:grid;grid-template-columns:64px minmax(0,1fr) 44px;align-items:center;gap:12px">
+            <span style="font-size:15px;font-weight:600">{{ e.label }}</span>
+            <span style="height:10px;border-radius:999px;background:#EAE4D8;overflow:hidden;display:block"><span style="display:block;height:100%;border-radius:999px;width:{{ e.pct }}%;background:{{ e.color }}"></span></span>
+            <span style="font-size:14px;color:#4A453E;text-align:right">{{ e.count }}개</span>
+          </div>
+        </sc-for>
+      </div>
+      <p style="margin:0;font-size:13.5px;color:#5A544B;line-height:1.6">{{ result.elementNote }}</p>
+    </div>
+  </section>
+
+  <div style="display:flex;flex-direction:{{ layoutDir }};gap:32px;align-items:flex-start">
+    <sc-if value="{{ wide }}" hint-placeholder-val="{{ true }}">
+      <nav aria-label="결과 항목 바로가기" style="position:sticky;top:24px;flex:0 0 232px;background:#FBF8F2;border:1px solid rgba(36,33,29,.1);border-radius:24px;padding:18px 12px;display:flex;flex-direction:column;gap:4px">
+        <p style="margin:0 12px 8px;font-size:13px;font-weight:600;color:#6B645A">일곱 가지 이야기</p>
+        <sc-for list="{{ navItems }}" as="n" hint-placeholder-count="7">
+          <button onClick="{{ n.go }}" aria-current="{{ n.current }}" style="display:flex;align-items:center;gap:10px;text-align:left;padding:10px 12px;border-radius:12px;border:0;cursor:pointer;font-size:15px;background:{{ n.bg }};color:{{ n.fg }};font-weight:{{ n.fw }}"><span style="font-family:'Nanum Myeongjo',serif;width:22px;color:{{ n.numColor }}">{{ n.no }}</span>{{ n.short }}</button>
+        </sc-for>
+      </nav>
+    </sc-if>
+    <sc-if value="{{ narrow }}" hint-placeholder-val="{{ false }}">
+      <nav aria-label="결과 항목 바로가기" style="position:sticky;top:0;z-index:5;width:calc(100% + 2 * clamp(16px,4vw,24px));margin:0 calc(-1 * clamp(16px,4vw,24px));padding:10px clamp(16px,4vw,24px);background:rgba(245,240,230,.94);backdrop-filter:blur(8px);border-bottom:1px solid rgba(36,33,29,.08)">
+        <div style="display:flex;gap:8px;overflow-x:auto;scrollbar-width:none">
+          <sc-for list="{{ navItems }}" as="n" hint-placeholder-count="7">
+            <button onClick="{{ n.go }}" aria-current="{{ n.current }}" style="flex:none;height:44px;padding:0 16px;border-radius:999px;cursor:pointer;font-size:14px;white-space:nowrap;border:1px solid {{ n.bd }};background:{{ n.chipBg }};color:{{ n.chipFg }};font-weight:{{ n.fw }}">{{ n.no }} {{ n.short }}</button>
+          </sc-for>
+        </div>
+      </nav>
+    </sc-if>
+
+    <div style="flex:1 1 0;min-width:0;width:100%;display:flex;flex-direction:column;gap:24px">
+      <sc-for list="{{ sections }}" as="s" hint-placeholder-count="7">
+        <section id="sec-{{ s.id }}" aria-labelledby="h-{{ s.id }}" style="scroll-margin-top:80px;background:#FBF8F2;border:1px solid rgba(36,33,29,.1);border-radius:clamp(20px,5vw,28px);padding:clamp(20px,5vw,36px) clamp(18px,4.5vw,36px);display:flex;flex-direction:column;gap:20px">
+          <div style="display:flex;gap:clamp(12px,3vw,16px);align-items:flex-start">
+            <span aria-hidden="true" style="flex:none;width:clamp(44px,11vw,56px);height:clamp(44px,11vw,56px);border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Nanum Myeongjo',serif;font-weight:800;font-size:24px;color:#574A86;background:#ECE8F3;border:1px solid rgba(87,74,134,.25);box-shadow:0 0 0 4px #FBF8F2,0 0 0 5px rgba(168,131,63,.35)">{{ s.icon }}</span>
+            <div style="display:flex;flex-direction:column;gap:6px;min-width:0">
+              <span style="font-size:13px;font-weight:600;color:#7D5F24;letter-spacing:0.04em">{{ s.no }}</span>
+              <h2 id="h-{{ s.id }}" style="margin:0;font-family:'Nanum Myeongjo',serif;font-size:clamp(22px,2.6vw,27px);font-weight:800;letter-spacing:-0.02em;line-height:1.35">{{ s.title }}</h2>
+              <p style="margin:2px 0 0;font-size:17px;font-weight:600;color:#3E3366;line-height:1.6;text-wrap:pretty">{{ s.summary }}</p>
+            </div>
+          </div>
+
+          <sc-if value="{{ s.isFortune }}" hint-placeholder-val="{{ true }}">
+            <div style="display:flex;flex-direction:column;gap:12px">
+              <sc-for list="{{ s.body }}" as="para" hint-placeholder-count="4">
+                <p style="margin:0;font-size:16.5px;line-height:1.85;color:#2E2A25;text-wrap:pretty">{{ para }}</p>
+              </sc-for>
+            </div>
+            <div style="padding:20px 22px;border-radius:20px;background:#F3EAD6;display:flex;flex-direction:column;gap:12px">
+              <p style="margin:0;font-size:14px;font-weight:700;color:#5C4A1F">✦ 이렇게 활용해 보세요</p>
+              <ol style="margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:10px">
+                <sc-for list="{{ s.tipsN }}" as="tp" hint-placeholder-count="2">
+                  <li style="display:flex;gap:12px;font-size:15.5px;line-height:1.65;color:#2E2A25"><span style="flex:none;width:24px;height:24px;border-radius:50%;background:#FBF8F2;color:#7D5F24;font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;margin-top:1px">{{ tp.n }}</span><span>{{ tp.t }}</span></li>
+                </sc-for>
+              </ol>
+            </div>
+            <button onClick="{{ s.toggle }}" aria-expanded="{{ s.isOpen }}" aria-controls="d-{{ s.id }}" style="align-self:flex-start;height:42px;padding:0 16px;border-radius:999px;border:1px solid rgba(36,33,29,.18);background:transparent;color:#24211D;font-size:14.5px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:8px" style-hover="background:#EFEADF">{{ s.toggleLabel }}<span aria-hidden="true" style="font-size:11px;transform:rotate({{ s.chev }}deg)">▼</span></button>
+            <sc-if value="{{ s.isOpen }}" hint-placeholder-val="{{ false }}">
+              <div id="d-{{ s.id }}" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));gap:12px;animation:ukFade .3s ease">
+                <sc-for list="{{ s.details }}" as="d" hint-placeholder-count="2">
+                  <div style="padding:18px 20px;border-radius:18px;border:1px solid rgba(36,33,29,.1);background:#fff;display:flex;flex-direction:column;gap:8px">
+                    <h3 style="margin:0;font-size:15px;font-weight:700;color:#3E3366">{{ d.label }}</h3>
+                    <p style="margin:0;font-size:15px;line-height:1.75;color:#3A352F">{{ d.text }}</p>
+                  </div>
+                </sc-for>
+              </div>
+            </sc-if>
+          </sc-if>
+
+          <sc-if value="{{ s.isMatch }}" hint-placeholder-val="{{ false }}">
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,230px),1fr));gap:14px">
+              <sc-for list="{{ s.ranksV }}" as="r" hint-placeholder-count="3">
+                <article style="position:relative;padding:22px 20px;border-radius:22px;background:#fff;border:1px solid {{ r.bd }};display:flex;flex-direction:column;gap:14px">
+                  <span style="position:absolute;top:16px;right:16px;font-size:13px;font-weight:700;padding:4px 10px;border-radius:999px;background:{{ r.rankBg }};color:{{ r.rankFg }}">{{ r.rankLabel }}</span>
+                  <div style="display:flex;align-items:center;gap:12px">
+                    <span aria-hidden="true" style="width:64px;height:64px;border-radius:50%;background:{{ r.tint }};display:flex;flex-direction:column;align-items:center;justify-content:center;border:2px solid #FBF8F2;box-shadow:0 0 0 1px rgba(36,33,29,.12)"><span style="font-family:'Nanum Myeongjo',serif;font-size:26px;font-weight:800;line-height:1">{{ r.hanja }}</span></span>
+                    <h3 style="margin:0;font-family:'Nanum Myeongjo',serif;font-size:21px;font-weight:800">{{ r.name }}띠</h3>
+                  </div>
+                  <div style="display:flex;flex-wrap:wrap;gap:6px">
+                    <sc-for list="{{ r.keywords }}" as="kw" hint-placeholder-count="2">
+                      <span style="white-space:nowrap;font-size:13.5px;font-weight:600;padding:4px 10px;border-radius:999px;background:#ECE8F3;color:#3E3366">{{ kw }}</span>
+                    </sc-for>
+                  </div>
+                  <p style="margin:0;font-size:14px;color:#5C4A1F;font-weight:600">어울리는 관계 · {{ r.relation }}</p>
+                  <p style="margin:0;font-size:15px;line-height:1.75;color:#3A352F">{{ r.reason }}</p>
+                </article>
+              </sc-for>
+            </div>
+            <p style="margin:0;font-size:14.5px;color:#4A453E;line-height:1.6">{{ s.notice }}</p>
+            <button onClick="{{ s.toggle }}" aria-expanded="{{ s.isOpen }}" style="align-self:flex-start;height:42px;padding:0 16px;border-radius:999px;border:1px solid rgba(36,33,29,.18);background:transparent;color:#24211D;font-size:14.5px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:8px" style-hover="background:#EFEADF">띠는 언제부터 바뀌나요?<span aria-hidden="true" style="font-size:11px;transform:rotate({{ s.chev }}deg)">▼</span></button>
+            <sc-if value="{{ s.isOpen }}" hint-placeholder-val="{{ false }}">
+              <p style="margin:0;padding:18px 20px;border-radius:18px;background:#fff;border:1px solid rgba(36,33,29,.1);font-size:15px;line-height:1.75;color:#3A352F;animation:ukFade .3s ease">{{ s.boundary }}</p>
+            </sc-if>
+          </sc-if>
+
+          <sc-if value="{{ s.isYear }}" hint-placeholder-val="{{ false }}">
+            <div style="padding:16px 20px;border-radius:18px;background:#ECE8F3;display:flex;flex-direction:column;gap:6px">
+              <p style="margin:0;font-size:14px;font-weight:700;color:#3E3366">순위는 이렇게 정했어요</p>
+              <p style="margin:0;font-size:14.5px;line-height:1.7;color:#2E2A25">{{ s.criteria }}</p>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:12px">
+              <sc-for list="{{ s.ranksV }}" as="r" hint-placeholder-count="3">
+                <article style="padding:20px;border-radius:22px;background:#fff;border:1px solid {{ r.bd }};display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,200px),1fr));gap:16px 20px;align-items:start">
+                  <div style="display:flex;align-items:center;gap:12px">
+                    <span aria-hidden="true" style="flex:none;width:60px;height:60px;border-radius:50%;background:{{ r.tint }};display:flex;align-items:center;justify-content:center;border:2px solid #FBF8F2;box-shadow:0 0 0 1px rgba(36,33,29,.12);font-family:'Nanum Myeongjo',serif;font-size:24px;font-weight:800">{{ r.hanja }}</span>
+                    <div style="display:flex;flex-direction:column;gap:4px">
+                      <span style="align-self:flex-start;font-size:12.5px;font-weight:700;padding:3px 9px;border-radius:999px;background:{{ r.rankBg }};color:{{ r.rankFg }}">{{ r.rankLabel }}</span>
+                      <h3 style="margin:0;font-family:'Nanum Myeongjo',serif;font-size:20px;font-weight:800">{{ r.name }}띠</h3>
+                    </div>
+                  </div>
+                  <div style="display:flex;flex-direction:column;gap:6px">
+                    <span style="font-size:13px;font-weight:700;color:#7D5F24">함께하면 좋은 활동</span>
+                    <span style="font-size:16px;font-weight:700;color:#24211D">{{ r.activity }}</span>
+                  </div>
+                  <div style="display:flex;flex-direction:column;gap:6px">
+                    <span style="font-size:13px;font-weight:700;color:#3E3366">기대할 수 있는 점</span>
+                    <span style="font-size:14.5px;line-height:1.7;color:#3A352F">{{ r.expect }}</span>
+                  </div>
+                  <div style="display:flex;flex-direction:column;gap:6px">
+                    <span style="font-size:13px;font-weight:700;color:#8A3B2E">주의할 점</span>
+                    <span style="font-size:14.5px;line-height:1.7;color:#3A352F">{{ r.caution }}</span>
+                  </div>
+                </article>
+              </sc-for>
+            </div>
+          </sc-if>
+        </section>
+      </sc-for>
+
+      <aside style="margin-top:12px;padding:28px;border-radius:24px;border:1px solid rgba(168,131,63,.35);background:rgba(243,234,214,.5);display:flex;flex-direction:column;gap:18px;align-items:center;text-align:center">
+        <span aria-hidden="true" style="color:#A8833F;letter-spacing:0.6em;font-size:12px">✦ ✦ ✦</span>
+        <p style="margin:0;font-size:15.5px;line-height:1.8;color:#3A352F;max-width:560px;text-wrap:pretty">사주 해석은 전통적인 해석 체계를 바탕으로 한 참고 콘텐츠입니다. 중요한 결정은 현실적인 정보와 본인의 판단을 함께 고려해 주세요.</p>
+        <div style="display:flex;flex-wrap:wrap;gap:10px;justify-content:center">
+          <button onClick="{{ toTop }}" style="white-space:nowrap;flex:none;height:44px;padding:0 18px;border-radius:14px;border:1px solid rgba(36,33,29,.2);background:transparent;color:#24211D;font-size:15px;font-weight:600;cursor:pointer">맨 위로</button>
+          <button onClick="{{ saveImage }}" aria-busy="{{ saving }}" style="white-space:nowrap;flex:none;height:44px;padding:0 18px;border-radius:14px;border:1px solid #574A86;background:transparent;color:#574A86;font-size:15px;font-weight:600;cursor:pointer">{{ saveLabel }}</button>
+          <button onClick="{{ restart }}" style="white-space:nowrap;flex:none;height:44px;padding:0 18px;border-radius:14px;border:0;background:#24211D;color:#FBF8F2;font-size:15px;font-weight:600;cursor:pointer">다시 입력하기</button>
+        </div>
+        <p style="margin:0;font-size:12.5px;line-height:1.6;color:#6B645A">명식은 공개 만세력 라이브러리로 계산하고, 해석 문장은 AI가 명식을 근거로 작성해요. 결과 이미지는 이 기기에서 바로 만들어져요.</p>
+      </aside>
+
+      <div aria-hidden="true" style="position:fixed;left:-10000px;top:0;pointer-events:none">
+        <div ref="{{ cardRef }}" style="width:540px;height:675px;box-sizing:border-box;padding:40px 40px 32px;background-color:#EFE6D3;background-image:radial-gradient(ellipse 60% 40% at 20% 15%,rgba(160,120,60,.12),transparent 70%),radial-gradient(ellipse 50% 35% at 85% 80%,rgba(150,110,55,.12),transparent 70%),radial-gradient(ellipse 120% 90% at 50% 45%,transparent 55%,rgba(110,80,40,.25) 100%);color:#24211D;font-family:Pretendard,'Noto Sans KR',sans-serif;display:flex;flex-direction:column;gap:20px;word-break:keep-all;position:relative;overflow:hidden">
+          <div style="position:absolute;inset:14px;border:1px solid rgba(156,132,88,.5);border-radius:18px"></div>
+          <div style="display:flex;justify-content:space-between;align-items:center;position:relative">
+            <span style="display:flex;align-items:baseline;gap:8px"><span style="font-family:'Nanum Myeongjo',serif;font-weight:800;font-size:24px">운결</span><span style="font-family:'Nanum Myeongjo',serif;font-size:13px;color:#7D5F24;letter-spacing:0.2em">運結</span></span>
+            <span style="font-size:12px;font-weight:700;color:#fff;background:#574A86;padding:4px 10px;border-radius:999px">{{ result.meta.label }}</span>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:8px;position:relative;margin-top:12px">
+            <span style="font-family:'Nanum Myeongjo',serif;font-weight:800;font-size:32px;line-height:1.3;letter-spacing:-0.02em">{{ resultTitle }}</span>
+            <span style="font-size:13px;color:#4A453E">{{ birthLine }}</span>
+          </div>
+          <p style="margin:0;font-family:'Nanum Myeongjo',serif;font-size:20px;line-height:1.7;color:#2E2A25;position:relative">“{{ result.summary }}”</p>
+          <div style="display:flex;flex-wrap:wrap;gap:8px;position:relative">
+            <sc-for list="{{ result.keywords }}" as="k" hint-placeholder-count="3">
+              <span style="white-space:nowrap;font-size:14px;font-weight:600;padding:6px 14px;border-radius:999px;background:#F3EAD6;color:#5C4A1F;border:1px solid rgba(168,131,63,.35)"># {{ k }}</span>
+            </sc-for>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:10px;position:relative;padding:18px;border-radius:18px;background:rgba(251,248,242,.85);border:1px solid rgba(36,33,29,.08)">
+            <span style="font-size:13px;font-weight:700;color:#3E3366">나와 어울리는 띠 TOP 3</span>
+            <div style="display:flex;gap:10px">
+              <sc-for list="{{ shareRanks }}" as="r" hint-placeholder-count="3">
+                <div style="flex:1;display:flex;align-items:center;gap:8px">
+                  <span style="width:40px;height:40px;border-radius:50%;background:{{ r.tint }};display:flex;align-items:center;justify-content:center;font-family:'Nanum Myeongjo',serif;font-weight:800;font-size:18px">{{ r.hanja }}</span>
+                  <span style="display:flex;flex-direction:column"><span style="font-size:11px;color:#6B645A;font-weight:600">{{ r.rankLabel }}</span><span style="font-size:14px;font-weight:700">{{ r.name }}띠</span></span>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+          <p style="margin:auto 0 0;font-size:11px;line-height:1.6;color:#5A544B;position:relative">사주 해석은 전통적인 해석 체계를 바탕으로 한 참고 콘텐츠입니다. 중요한 결정은 현실적인 정보와 본인의 판단을 함께 고려해 주세요.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+</sc-if>
+
+<footer style="margin-top:auto;padding:28px 24px 36px;text-align:center;font-size:13px;color:#6B645A">운결 · 나의 운을 읽고, 좋은 인연을 연결하다</footer>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;startScreen&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;input&quot;,&quot;loading&quot;,&quot;result&quot;],&quot;default&quot;:&quot;input&quot;,&quot;tsType&quot;:&quot;'input'|'loading'|'result'&quot;,&quot;section&quot;:&quot;프로토타입&quot;},&quot;showGender&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;프로토타입&quot;}}">
+class Component extends DCLogic {
+  static EMPTY = { name: '', year: '', month: '', day: '', calendar: 'solar', leap: false, hour: '', minute: '', timeUnknown: false, region: '대한민국', regionOther: '', gender: null };
+  state = { screen: 'input', form: { ...Component.EMPTY }, touched: {}, submitted: false, loadStep: 0, result: null, open: {}, active: 'children', wide: typeof window !== 'undefined' ? window.innerWidth >= 980 : true, ready: !!window.UngyeolData };
+
+  cardRef = React.createRef();
+
+  saveImage = async () => {
+    if (this.state.saving) return;
+    const node = this.cardRef.current, lib = window.htmlToImage;
+    if (!node || !lib) { this.setState({ saveMsg: '이미지 도구를 불러오는 중이에요. 잠시 후 다시 눌러 주세요.', saveErr: true }); return; }
+    this.setState({ saving: true, saveMsg: '', saveErr: false });
+    try {
+      const opts = { pixelRatio: 2, cacheBust: true, backgroundColor: '#EFE6D3' };
+      if (document.fonts && document.fonts.ready) await document.fonts.ready;
+      let blob;
+      try { blob = await lib.toBlob(node, opts); } catch (e) { blob = await lib.toBlob(node, { ...opts, skipFonts: true }); }
+      if (!blob) throw new Error('empty');
+      const nm = this.state.form.name.trim();
+      const fname = `운결_${nm || '사주이야기'}.png`;
+      const file = typeof File !== 'undefined' ? new File([blob], fname, { type: 'image/png' }) : null;
+      const touch = window.matchMedia && window.matchMedia('(pointer: coarse)').matches;
+      if (touch && file && navigator.canShare && navigator.canShare({ files: [file] })) {
+        await navigator.share({ files: [file], title: '운결 · 사주 이야기' });
+        this.setState({ saveMsg: '공유 메뉴에서 ‘이미지 저장’을 선택하면 사진첩에 저장돼요.' });
+      } else {
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a'); a.href = url; a.download = fname;
+        document.body.appendChild(a); a.click(); a.remove();
+        setTimeout(() => URL.revokeObjectURL(url), 4000);
+        this.setState({ saveMsg: `‘${fname}’ 파일로 저장했어요.` });
+      }
+    } catch (e) {
+      if (e && e.name === 'AbortError') this.setState({ saveMsg: '' });
+      else this.setState({ saveMsg: '이미지를 만들지 못했어요. 잠시 후 다시 시도해 주세요.', saveErr: true });
+    } finally { this.setState({ saving: false }); }
+  };
+
+  componentDidMount() {
+    this._onResize = () => { const w = window.innerWidth >= 980; if (w !== this.state.wide) this.setState({ wide: w }); };
+    this._onScroll = () => this.trackActive();
+    window.addEventListener('resize', this._onResize);
+    window.addEventListener('scroll', this._onScroll, { passive: true });
+    if (window.UngyeolData) this.applyStart();
+    else this._poll = setInterval(() => { if (window.UngyeolData) { clearInterval(this._poll); this.setState({ ready: true }); this.applyStart(); } }, 50);
+  }
+  componentWillUnmount() {
+    window.removeEventListener('resize', this._onResize);
+    window.removeEventListener('scroll', this._onScroll);
+    clearInterval(this._poll); (this._timers || []).forEach(clearTimeout);
+  }
+  componentDidUpdate(prev) { if (prev.startScreen !== this.props.startScreen) this.applyStart(); }
+
+  applyStart() {
+    const s = this.props.startScreen || 'input';
+    if (s === 'input') { (this._timers || []).forEach(clearTimeout); this.setState({ screen: 'input' }); return; }
+    const f = { ...window.UngyeolData.sampleInput };
+    this.setState({ form: f });
+    this.startAnalysis(f, s === 'loading');
+  }
+
+  // 입력 → API 요청 형태로 정규화
+  toInput(f) {
+    return {
+      name: f.name.trim() || null, calendar: f.calendar, isLeapMonth: f.calendar === 'lunar' && f.leap,
+      birth: { year: +f.year, month: +f.month, day: +f.day },
+      time: f.timeUnknown ? null : { hour: +f.hour, minute: f.minute === '' ? 0 : +f.minute },
+      region: '대한민국',
+      gender: this.props.showGender === false ? null : f.gender,
+    };
+  }
+
+  startAnalysis(form, hold) {
+    (this._timers || []).forEach(clearTimeout);
+    this.setState({ screen: 'loading', loadStep: 0, open: {} });
+    window.scrollTo(0, 0);
+    this._timers = [setTimeout(() => this.setState({ loadStep: 1 }), 900), setTimeout(() => this.setState({ loadStep: 2 }), 1800)];
+    const min = new Promise(r => this._timers.push(setTimeout(r, 2700)));
+    const token = (this._run = (this._run || 0) + 1);
+    this.setState({ formError: '' });
+    Promise.all([window.UngyeolData.analyze(this.toInput(form)), min]).then(([result]) => {
+      if (hold || token !== this._run || this.state.screen !== 'loading') return;
+      this.setState({ screen: 'result', result, active: 'children' });
+      window.scrollTo(0, 0);
+    }).catch(err => {
+      if (token !== this._run) return;
+      this.setState({ screen: 'input', formError: (err && err.message) || '분석 중 문제가 생겼어요. 다시 시도해 주세요.' });
+      window.scrollTo(0, 0);
+    });
+  }
+
+  validate(f) {
+    const e = {}, now = new Date();
+    const Y = +f.year, M = +f.month, D = +f.day, lunar = f.calendar === 'lunar';
+    if (!f.year) e.year = '태어난 연도를 입력해 주세요.';
+    else if (!/^\d{4}$/.test(f.year)) e.year = '연도는 4자리 숫자로 입력해 주세요. (예: 1994)';
+    else if (Y < 1900) e.year = '1900년 이후 연도를 입력해 주세요.';
+    else if (Y > now.getFullYear()) e.year = '미래의 연도는 입력할 수 없어요.';
+    if (!f.month) e.month = '태어난 월을 입력해 주세요.';
+    else if (M < 1 || M > 12) e.month = '월은 1에서 12 사이로 입력해 주세요.';
+    if (!f.day) e.day = '태어난 일을 입력해 주세요.';
+    else {
+      const max = lunar ? 30 : (M >= 1 && M <= 12 ? new Date(Y || 2000, M, 0).getDate() : 31);
+      if (D < 1 || D > max) e.day = lunar ? '음력 날짜는 1일에서 30일 사이로 입력해 주세요.' : (M >= 1 && M <= 12 ? `${M}월은 ${max}일까지 있어요. 날짜를 확인해 주세요.` : '일은 1에서 31 사이로 입력해 주세요.');
+      else if (!e.year && !e.month && new Date(Y, M - 1, D) > now) e.day = '오늘 이후의 날짜는 입력할 수 없어요.';
+    }
+    if (!f.timeUnknown) {
+      if (f.hour === '') e.hour = '태어난 시를 입력하거나 ‘시간 모름’을 선택해 주세요.';
+      else if (+f.hour > 23) e.hour = '시는 0에서 23 사이로 입력해 주세요.';
+      if (f.minute !== '' && +f.minute > 59) e.minute = '분은 0에서 59 사이로 입력해 주세요.';
+    }
+    return e;
+  }
+
+  setField(k, v) { this.setState(s => ({ form: { ...s.form, [k]: v } })); }
+
+  submit = (ev) => {
+    ev.preventDefault();
+    const errs = this.validate(this.state.form);
+    const order = ['year', 'month', 'day', 'hour', 'minute', 'regionOther'];
+    const first = order.find(k => errs[k]);
+    if (first) { this.setState({ submitted: true }); setTimeout(() => { const el = document.getElementById('f-' + first); el && el.focus(); }, 0); return; }
+    this.startAnalysis(this.state.form, false);
+  };
+
+  goTo(id) {
+    const el = document.getElementById('sec-' + id); if (!el) return;
+    const off = this.state.wide ? 24 : 72;
+    window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - off, behavior: 'smooth' });
+    this.setState({ active: id });
+  }
+  trackActive() {
+    if (this.state.screen !== 'result' || !this.state.result) return;
+    let cur = this.state.result.sections[0].id;
+    for (const s of this.state.result.sections) { const el = document.getElementById('sec-' + s.id); if (el && el.getBoundingClientRect().top < 160) cur = s.id; }
+    if (cur !== this.state.active) this.setState({ active: cur });
+  }
+
+  birthLine(f) {
+    const cal = f.calendar === 'solar' ? '양력' : '음력' + (f.leap ? '(윤달)' : '');
+    let t = '시간 모름';
+    if (!f.timeUnknown && f.hour !== '') { const h = +f.hour, m = f.minute === '' ? 0 : +f.minute; t = `${h < 12 ? '오전' : '오후'} ${h % 12 || 12}시${m ? ' ' + m + '분' : ''}`; }
+    const g = this.props.showGender === false ? null : ({ female: '여성', male: '남성' })[f.gender];
+    return [`${cal} ${f.year}년 ${+f.month}월 ${+f.day}일`, t, g].filter(Boolean).join(' · ');
+  }
+
+  renderVals() {
+    const D = window.UngyeolData, st = this.state, f = st.form;
+    const errors = this.validate(f);
+    const showK = k => !!errors[k] && (st.submitted || !!st.touched[k]);
+    const keys = ['year', 'month', 'day', 'hour', 'minute', 'regionOther'];
+    const show = {}, bc = {}, h = {}, b = {};
+    keys.forEach(k => { show[k] = showK(k); bc[k] = show[k] ? '#A33A2A' : 'rgba(36,33,29,.18)'; b[k] = () => this.setState(s => ({ touched: { ...s.touched, [k]: true } })); });
+    const num = (k, n) => e => { const raw = e.target.value; const v = (e.nativeEvent && e.nativeEvent.isComposing) ? raw : raw.replace(/[０-９]/g, c => String.fromCharCode(c.charCodeAt(0) - 65248)).replace(/[^\d]/g, '').slice(0, n); this.setField(k, v); };
+    keys.forEach(k => { const prev = b[k]; b[k] = (e) => { const v = this.state.form[k]; if (k !== 'regionOther' && typeof v === 'string' && /\D/.test(v)) this.setField(k, v.replace(/\D/g, '')); prev(e); }; });
+    Object.assign(h, {
+      name: e => this.setField('name', e.target.value), year: num('year', 4), month: num('month', 2), day: num('day', 2),
+      hour: num('hour', 2), minute: num('minute', 2), region: e => this.setField('region', e.target.value),
+      regionOther: e => this.setField('regionOther', e.target.value), leap: e => this.setField('leap', e.target.checked),
+      timeUnknown: e => this.setState(s => ({ form: { ...s.form, timeUnknown: e.target.checked } })),
+      solar: () => this.setField('calendar', 'solar'), lunar: () => this.setField('calendar', 'lunar'),
+    });
+    const seg = on => on ? ['#FBF8F2', '#24211D', '0 1px 3px rgba(36,33,29,.15)'] : ['transparent', '#5A544B', 'none'];
+    const [sB, sF, sS] = seg(f.calendar === 'solar'), [lB, lF, lS] = seg(f.calendar === 'lunar');
+    const cal = { solar: f.calendar === 'solar', lunar: f.calendar === 'lunar', solarBg: sB, solarFg: sF, solarSh: sS, lunarBg: lB, lunarFg: lF, lunarSh: lS };
+    const genderOpts = [['female', '여성'], ['male', '남성'], [null, '선택 안 함']].map(([v, label]) => {
+      const on = f.gender === v;
+      return { label, on, pick: () => this.setField('gender', v), bg: on ? '#ECE8F3' : '#fff', fg: on ? '#3E3366' : '#3A352F', bd: on ? '#574A86' : 'rgba(36,33,29,.18)', fw: on ? 700 : 500 };
+    });
+    const M = +f.month, Dd = +f.day;
+    const showIpchunHint = f.calendar === 'solar' && (M === 1 || (M === 2 && Dd >= 1 && Dd <= 5));
+
+    const steps = ['만세력으로 사주팔자를 계산하고 있어요', '오행과 띠의 관계를 살펴보고 있어요', '이야기를 차분히 엮고 있어요 · 20초쯤 걸려요'];
+    const loadSteps = steps.map((label, i) => ({ label, color: i <= st.loadStep ? '#24211D' : '#8A8378', fw: i === st.loadStep ? 700 : 500, dot: i < st.loadStep ? '#A8833F' : i === st.loadStep ? '#574A86' : '#D8D1C3' }));
+    const nm = f.name.trim();
+
+    const EL = { wood: ['목(木)', '#4F7A55', '목'], fire: ['화(火)', '#B0493A', '화'], earth: ['토(土)', '#9A7430', '토'], metal: ['금(金)', '#6E737B', '금'], water: ['수(水)', '#3C5A85', '수'] };
+    const ELX = { ...EL, none: ['', '#A39C90', ''] };
+    const R = st.result;
+    let pillars = [], elementRows = [], sections = [], navItems = [];
+    const circled = ['①', '②', '③', '④', '⑤', '⑥', '⑦'];
+    const shortName = { children: '자녀운', spouse: '배우자운', money: '금전운', work: '직장운', match: '어울리는 띠', year: '2027년 띠', study: '공부운' };
+    if (R && D) {
+      pillars = R.pillars.map(p => ({ ...p, stemColor: ELX[p.stemEl][1], branchColor: ELX[p.branchEl][1],
+        stemCap: p.unknown ? '시간 모름' : `${p.stemKo} · ${ELX[p.stemEl][2]}`, branchCap: p.unknown ? '' : `${p.branchKo} · ${ELX[p.branchEl][2]}`,
+        stemGod: p.stemGod || '', branchGod: p.branchGod || '',
+        bg: p.isDay ? '#ECE8F3' : p.unknown ? '#F4F0E8' : '#fff', bd: p.isDay ? 'rgba(87,74,134,.4)' : 'rgba(36,33,29,.1)' }));
+      const max = Math.max(...Object.values(R.elements), 1);
+      elementRows = Object.keys(EL).map(k => ({ label: EL[k][0], color: EL[k][1], count: R.elements[k], pct: Math.round(R.elements[k] / max * 100) }));
+      const rankC = [['#574A86', '#fff', 'rgba(87,74,134,.45)'], ['#E4DDF0', '#3E3366', 'rgba(36,33,29,.12)'], ['#EFEADF', '#4A453E', 'rgba(36,33,29,.12)']];
+      sections = R.sections.map((s, i) => {
+        const open = !!st.open[s.id];
+        return {
+          ...s, no: circled[i], isFortune: s.type === 'fortune', isMatch: s.type === 'match', isYear: s.type === 'year',
+          isOpen: open, chev: open ? 180 : 0, toggleLabel: open ? '접기' : '더 자세히 보기',
+          toggle: () => this.setState(x => ({ open: { ...x.open, [s.id]: !x.open[s.id] } })),
+          tipsN: (s.tips || []).map((t, j) => ({ t, n: j + 1 })),
+          ranksV: (s.ranks || []).map(r => { const z = D.ZODIAC[r.animal], c = rankC[r.rank - 1]; return { ...r, ...z, rankLabel: r.rank + '위', rankBg: c[0], rankFg: c[1], bd: c[2] }; }),
+        };
+      });
+      navItems = R.sections.map((s, i) => {
+        const on = st.active === s.id;
+        return { no: circled[i], short: shortName[s.id] || s.title, go: () => this.goTo(s.id), current: on ? 'true' : undefined, bg: on ? '#ECE8F3' : 'transparent', fg: on ? '#3E3366' : '#3A352F', fw: on ? 700 : 500, numColor: on ? '#574A86' : '#7D5F24', chipBg: on ? '#574A86' : '#FBF8F2', chipFg: on ? '#fff' : '#3A352F', bd: on ? '#574A86' : 'rgba(36,33,29,.14)' };
+      });
+    }
+
+    const loader = React.createElement('div', { 'aria-hidden': true, style: { position: 'relative', width: 132, height: 132 } },
+      React.createElement('svg', { width: 132, height: 132, viewBox: '0 0 132 132', style: { position: 'absolute', inset: 0, animation: 'ukSpin 9s linear infinite' } },
+        React.createElement('circle', { cx: 66, cy: 66, r: 60, fill: 'none', stroke: '#B79A5E', strokeWidth: 1, strokeDasharray: '2 7' }),
+        React.createElement('circle', { cx: 66, cy: 6, r: 4, fill: '#A8833F' })),
+      React.createElement('svg', { width: 132, height: 132, viewBox: '0 0 132 132', style: { position: 'absolute', inset: 0, animation: 'ukSpin 5s linear infinite reverse' } },
+        React.createElement('circle', { cx: 66, cy: 66, r: 42, fill: 'none', stroke: '#574A86', strokeWidth: 1.4, strokeDasharray: '90 174', strokeLinecap: 'round' })),
+      React.createElement('div', { style: { position: 'absolute', inset: 40, borderRadius: '50%', background: '#ECE8F3', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: "'Nanum Myeongjo', serif", fontWeight: 800, fontSize: 24, color: '#574A86', animation: 'ukBreath 2.4s ease-in-out infinite' } }, '運'));
+
+    return {
+      isInput: st.screen === 'input', isLoading: st.screen === 'loading', isResult: st.screen === 'result' && !!R,
+      form: f, errors, show, bc, h, b, cal, genderOpts, showIpchunHint,
+      showGender: this.props.showGender !== false,
+      isLunar: f.calendar === 'lunar', isOtherRegion: f.region === '기타',
+      timeOpacity: f.timeUnknown ? 0.45 : 1,
+      dateErrors: ['year', 'month', 'day'].filter(k => show[k]).map(k => errors[k]),
+      timeErrors: ['hour', 'minute'].filter(k => show[k]).map(k => errors[k]),
+      previewTopics: ['자녀운', '배우자운', '금전운', '직장운', '나와 어울리는 띠', '2027년 함께하면 좋은 띠', '공부운'],
+      submit: this.submit,
+      loader, loadSteps, loadingTitle: nm ? `${nm}님의 사주를 차분히 펼쳐 보고 있어요` : '당신의 사주를 차분히 펼쳐 보고 있어요',
+      result: R || { meta: {}, keywords: [] }, resultTitle: nm ? `${nm}님의 사주 이야기` : '당신의 사주 이야기',
+      birthLine: R ? this.birthLine(f) : '', pillars, elementRows, sections, navItems,
+      formError: st.formError || '', retry: () => this.startAnalysis(this.state.form, false),
+      cardRef: this.cardRef, saveImage: this.saveImage, saving: !!st.saving,
+      saveLabel: st.saving ? '이미지 만드는 중…' : '결과 이미지 저장', saveOpacity: st.saving ? 0.7 : 1,
+      saveMsg: st.saveMsg || '', saveMsgColor: st.saveErr ? '#A33A2A' : '#3E3366',
+      shareRanks: (sections.find(s => s.isMatch) || { ranksV: [] }).ranksV,
+      wide: st.wide, narrow: !st.wide, layoutDir: st.wide ? 'row' : 'column',
+      editInfo: () => { this.setState({ screen: 'input', submitted: false, touched: {} }); window.scrollTo(0, 0); },
+      restart: () => { this.setState({ screen: 'input', form: { ...Component.EMPTY }, submitted: false, touched: {}, result: null, open: {}, saveMsg: '' }); window.scrollTo(0, 0); },
+      goHome: () => { if (st.screen !== 'loading') { this.setState({ screen: 'input' }); window.scrollTo(0, 0); } },
+      toTop: () => window.scrollTo({ top: 0, behavior: 'smooth' }),
+    };
+  }
+}
+</script>
+</body>
+</html>
