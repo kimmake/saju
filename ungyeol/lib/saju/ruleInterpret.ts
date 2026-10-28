@@ -17,7 +17,7 @@ const GOD_TRAIT: Record<string, string> = {
   비견: '독립심과 자존심', 겁재: '승부욕과 경쟁심', 식신: '여유로운 표현과 돌봄', 상관: '날카로운 표현력과 개성', 편재: '활동적이고 유동적인 재물 감각',
   정재: '성실하고 안정적인 관리 습관', 편관: '책임감과 긴장감 있는 추진력', 정관: '원칙과 질서를 지키려는 태도', 편인: '독특한 사고와 직관', 정인: '배우고 보살피려는 마음',
 };
-const STEM_INFO: Record<string, { image: string; trait: string; env: string }> = {
+export const STEM_INFO: Record<string, { image: string; trait: string; env: string }> = {
   甲: { image: '곧게 뻗는 큰 나무', trait: '곧고 추진력이 있으며 앞장서려는', env: '탁 트이고 햇빛이 드는 곳' },
   乙: { image: '유연한 풀과 덩굴', trait: '부드럽고 적응력이 좋으며 끈기 있는', env: '사람 소리가 적당히 있는 아늑한 곳' },
   丙: { image: '밝은 태양', trait: '밝고 열정적이며 숨김이 적은', env: '환하고 활기찬 공간' },

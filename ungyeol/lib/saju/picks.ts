@@ -1,42 +1,78 @@
 import type { Chart } from './chart';
-import { analyzeGods } from './ruleInterpret';
+import { analyzeGods, STEM_INFO } from './ruleInterpret';
 
 export interface Pick { title: string; text: string }
 
 /** 명식에서 결정적으로 뽑는 값: 같은 사주는 항상 같은 표현, 다른 사주는 다른 표현이 나오도록 쓴다. */
 const seedOf = (chart: Chart) => [...(chart.gz.year + chart.gz.month + chart.gz.day + (chart.gz.time ?? ''))].reduce((a, c) => a + c.charCodeAt(0), 0);
 
-const STUDY: Record<string, [string, string]> = {
-  long: ['1년 이상 공부하기', '짧게 끝내지 말고 1년 이상 붙들 공부 주제를 하나 정해 보세요. 길게 가는 힘이 쌓일수록 실력이 눈에 띄게 달라져요.'],
-  daily: ['삶에 공부를 꾸준히 하기', '하루 20분이라도 공부 시간을 생활 속에 고정해 보세요. 공부가 특별한 일이 아니라 일상의 습관이 되면 흔들림이 줄어요.'],
-  together: ['함께 공부하기', '스터디나 독서 모임처럼 함께 배우면 포기하기 어려워지고, 서로의 질문에서 배우는 것도 많아져요.'],
-  deep: ['새 학문 깊게 파보기', '평소 접하지 않던 학문 하나를 골라 입문서에서 멈추지 말고 한 권, 한 과정을 끝까지 파고들어 보세요. 시야가 크게 넓어져요.'],
+const TITLE: Record<string, string> = { long: '1년 이상 공부하기', daily: '삶에 공부를 꾸준히 하기', together: '함께 공부하기', deep: '새 학문 깊게 파보기', meet: '새로운 사람 만나기', open: '사람들에게 마음을 더 열기' };
+// 항목마다 5가지 풀이를 두고, 사주 값으로 하나를 고른다. 앞에는 일간 기질을, 뒤에는 마무리 한마디를 붙여 사람마다 다르게 읽히게 한다.
+const CORE: Record<string, string[]> = {
+  meet: [
+    '이번 달에는 평소 가지 않던 모임이나 동호회에 한 번 나가 보세요. 낯선 자리에서 나누는 짧은 대화가 새 인연의 시작이 되기도 해요.',
+    '주변 사람에게 소개해 줄 만한 사람이 있는지 물어봐 보세요. 아는 사람의 아는 사람은 부담 없이 시작하기 좋은 인연이에요.',
+    '취미나 배움을 매개로 사람을 만나 보세요. 같은 관심사가 있으면 처음 만나도 대화가 쉽게 풀려요.',
+    '한 달에 새로운 사람 한 명과 차 한잔하겠다는 작은 목표를 세워 보세요. 부담 없는 만남이 쌓이면 인맥의 폭이 달라져요.',
+    '온라인 커뮤니티나 지역 모임처럼 문턱이 낮은 곳부터 시작해 보세요. 가볍게 시작해도 마음이 맞는 사람을 만날 수 있어요.',
+  ],
+  open: [
+    '먼저 안부를 묻고 속마음을 한 가지만 더 꺼내 보세요. 마음을 연 만큼 상대도 가까이 다가와요.',
+    '고마운 마음은 미루지 말고 말로 전해 보세요. 표현이 쌓이면 관계의 온도가 달라져요.',
+    '도움이 필요할 때 혼자 버티지 말고 가까운 사람에게 부탁해 보세요. 기대는 용기가 관계를 깊게 만들어요.',
+    '상대의 이야기를 끝까지 듣고 내 이야기도 솔직하게 나눠 보세요. 서로 열린 대화가 신뢰를 키워요.',
+    '거리를 두던 사람에게 먼저 연락해 보세요. 작은 먼저가 오래 소원했던 사이를 풀어 주기도 해요.',
+  ],
+  long: [
+    '짧게 끝내지 말고 1년 이상 이어 갈 공부 주제를 하나 정해 보세요. 길게 가는 힘이 쌓일수록 실력이 눈에 띄게 달라져요.',
+    '1년 뒤의 나를 그려 보고 거기에 필요한 공부를 거꾸로 계획해 보세요. 긴 호흡이 중간의 슬럼프를 견디게 해 줘요.',
+    '한두 달 해 보고 판단하기보다 1년을 한 단위로 잡아 보세요. 처음 몇 달은 더디고 그 뒤에 속도가 붙는 경우가 많아요.',
+    '1년 과정의 강의나 자격 과정, 연간 독서 계획처럼 끝이 보이는 긴 틀을 하나 만들어 보세요.',
+    '매달 작은 이정표를 세우고 1년 동안 이어 가 보세요. 쌓인 기록이 큰 자신감이 돼요.',
+  ],
+  daily: [
+    '하루 20분이라도 공부 시간을 생활 속에 고정해 보세요. 공부가 특별한 일이 아니라 일상이 되면 흔들림이 줄어요.',
+    '출퇴근길이나 잠들기 전처럼 정해진 자리에 공부를 끼워 넣어 보세요. 공부가 삶의 리듬이 되면 오래 갈 수 있어요.',
+    '양을 욕심내기보다 오늘도 한 쪽을 지키는 데 집중해 보세요. 매일의 작은 습관이 큰 차이를 만들어요.',
+    '공부 도구를 눈에 띄는 곳에 두고 시작을 쉽게 만들어 보세요. 시작의 문턱이 낮을수록 꾸준해져요.',
+    '일과 삶 속에서 배운 것을 짧게 기록해 보세요. 일상이 곧 공부가 되면 따로 시간을 내기도 쉬워져요.',
+  ],
+  together: [
+    '스터디나 독서 모임처럼 함께 배우면 포기하기 어려워지고, 서로의 질문에서 배우는 것도 많아져요.',
+    '배운 것을 나누고 질문을 주고받을 공부 친구를 찾아보세요. 설명해 보는 과정에서 이해가 더 깊어져요.',
+    '온라인 스터디나 학습 커뮤니티에서 인증하며 공부해 보세요. 서로 지켜봐 주는 힘이 꾸준함을 만들어요.',
+    '같은 분야를 공부하는 사람과 주 1회 짧게 만나 진도를 공유해 보세요.',
+    '가르쳐 주고 배우는 관계를 만들어 보세요. 누군가에게 설명할 때 내 지식이 단단해져요.',
+  ],
+  deep: [
+    '평소 접하지 않던 학문 하나를 골라 입문서에서 멈추지 말고 한 권, 한 과정을 끝까지 파고들어 보세요.',
+    '낯선 분야를 맛만 보지 말고 깊이 들어가 보세요. 한 분야를 깊게 파 본 경험이 다른 공부의 바탕이 돼요.',
+    '관심이 가는 분야의 기초 개념 열 가지를 정해 하나씩 이해될 때까지 파 보세요.',
+    '입문서 다음 단계의 책이나 원서·논문에 도전해 보세요. 어려운 구간을 넘으면 시야가 크게 넓어져요.',
+    '궁금한 주제를 하나 정해 글이나 발표로 풀어낼 수 있을 때까지 깊이 공부해 보세요.',
+  ],
 };
-const STUDY_ALT: Record<string, string> = {
-  long: '한두 달로 끝내지 않고 1년 이상 이어 갈 공부를 정해 두면, 중간에 지치는 시기를 지나고 나서 눈에 띄는 변화가 와요.',
-  daily: '출퇴근길이나 잠들기 전처럼 정해진 자리에 공부를 끼워 넣어 보세요. 공부가 삶의 리듬이 되면 오래 갈 수 있어요.',
-  together: '배운 것을 나누고 질문을 주고받을 공부 친구를 찾아보세요. 설명해 보는 과정에서 이해가 더 깊어져요.',
-  deep: '낯선 분야를 맛만 보지 말고 깊이 들어가 보세요. 한 분야를 깊게 파 본 경험이 다른 공부의 바탕이 돼요.',
+const CLOSER: Record<'people' | 'study', string[]> = {
+  people: ['처음엔 어색해도 서너 번 마주하면 편해지니 한두 번으로 판단하지 마세요.', '작은 표현 하나가 관계를 이어 주니 너무 거창하게 생각하지 마세요.', '모든 만남이 깊을 필요는 없으니 편안한 마음으로 시작해 보세요.'],
+  study: ['중간에 쉬어도 괜찮으니 멈추지만 않으면 돼요.', '진도보다 이어 가는 것 자체를 목표로 삼아 보세요.', '달력에 시작일과 점검일을 적어 두면 훨씬 수월해요.'],
 };
-const PEOPLE: Record<string, [string, string]> = {
-  meet: ['새로운 사람 만나기', '모임·동호회·소개 자리 등 새로운 사람을 만날 기회를 한 달에 한 번이라도 만들어 보세요. 익숙한 테두리 밖에서 새 기운이 들어와요.'],
-  open: ['사람들에게 마음을 더 열기', '먼저 안부를 묻고 속마음을 조금 더 나눠 보세요. 마음을 열수록 관계가 깊어지고 도움도 받기 쉬워져요.'],
-};
-const PEOPLE_ALT: Record<string, string> = {
-  meet: '평소 가지 않던 곳에서 새로운 사람과 이야기해 보세요. 뜻밖의 대화가 인연이나 도움으로 이어질 수 있어요.',
-  open: '내 이야기를 먼저 꺼내고 상대의 이야기를 끝까지 들어 보세요. 열린 태도가 관계의 문을 넓혀 줘요.',
-};
+const IDX: Record<string, number> = { meet: 0, open: 1, long: 2, daily: 3, together: 4, deep: 5 };
+function build(chart: Chart, key: string, kind: 'people' | 'study'): Pick {
+  const seed = seedOf(chart), info = STEM_INFO[chart.dayStem];
+  const core = CORE[key][(seed + IDX[key] * 3) % 5], closer = CLOSER[kind][((seed >> 2) + IDX[key]) % 3];
+  return { title: TITLE[key], text: `${info.image}처럼 ${info.trait} 기질이라, ${core} ${closer}` };
+}
 
 /** 공부: 인성이 많으면 깊이·함께, 적으면 꾸준함·긴 호흡, 보통이면 사주마다 돌려 가며 2개를 고른다. */
 export function pickStudy(chart: Chart): Pick[] {
-  const a = analyzeGods(chart), seed = seedOf(chart), alt = seed % 2 === 1;
+  const a = analyzeGods(chart), seed = seedOf(chart);
   const keys = a.counts.인성 >= 3 ? ['deep', 'together'] : a.counts.인성 <= 1 ? ['daily', 'long'] : [['long', 'together'], ['daily', 'deep'], ['together', 'daily'], ['deep', 'long']][seed % 4];
-  return keys.map(k => ({ title: STUDY[k][0], text: alt ? STUDY_ALT[k] : STUDY[k][1] }));
+  return keys.map(k => build(chart, k, 'study'));
 }
 
 /** 사람: 일간이 강하면 마음 열기, 약하면 새로운 사람 만나기(도움 받을 인연), 균형이면 둘 다. */
 export function pickPeople(chart: Chart): Pick[] {
-  const a = analyzeGods(chart), alt = (seedOf(chart) >> 1) % 2 === 1;
+  const a = analyzeGods(chart);
   const keys = a.strength === 'strong' ? ['open'] : a.strength === 'weak' ? ['meet'] : ['meet', 'open'];
-  return keys.map(k => ({ title: PEOPLE[k][0], text: alt ? PEOPLE_ALT[k] : PEOPLE[k][1] }));
+  return keys.map(k => build(chart, k, 'people'));
 }
