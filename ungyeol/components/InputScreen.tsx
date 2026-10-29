@@ -54,9 +54,18 @@ export default function InputScreen({ form: f, touched, submitted, formError, on
           <g fill="#A8833F"><circle cx="20" cy="90" r="2.4" /><circle cx="70" cy="58" r="3" /><circle cx="118" cy="70" r="2" /><circle cx="160" cy="30" r="3.4" /><circle cx="204" cy="46" r="2.2" /></g>
         </svg>
         <p style={{ margin: '0 0 20px', fontSize: 14, color: '#574A86', fontWeight: 600, letterSpacing: '0.02em' }}>나의 운을 읽고, 좋은 인연을 연결하다</p>
-        <h1 className="serif" style={{ margin: 0, fontWeight: 800, fontSize: 'clamp(34px,4.6vw,54px)', lineHeight: 1.28, letterSpacing: '-0.03em', textWrap: 'balance' }}>당신의 사주에 담긴 이야기를 만나보세요.</h1>
-        <svg width="168" height="18" viewBox="0 0 168 18" aria-hidden="true" style={{ display: 'block', margin: '22px 0 20px' }}><path d="M2 12 Q 22 2 42 10 T 82 10 T 122 10 T 166 8" stroke="#A8833F" strokeWidth="1.4" fill="none" strokeLinecap="round" /></svg>
-        <p style={{ margin: 0, fontSize: 18, lineHeight: 1.7, color: '#4A453E', maxWidth: 440 }}>타고난 기질부터 관계, 재물, 공부와 일의 흐름까지.</p>
+        <div style={{ position: 'relative', overflow: 'hidden', borderRadius: 24, padding: 'clamp(28px,5vw,44px) clamp(22px,4vw,40px) clamp(26px,4.5vw,38px)', background: 'radial-gradient(ellipse 70% 60% at 85% 12%,rgba(214,186,120,.22),transparent 60%),radial-gradient(ellipse 90% 50% at 15% 100%,rgba(120,100,70,.35),transparent 65%),linear-gradient(180deg,#0B0D1B 0%,#12142A 55%,#0E0F1E 100%)', boxShadow: '0 24px 48px -28px rgba(10,12,30,.7)', border: '1px solid rgba(183,154,94,.45)' }}>
+          <div aria-hidden="true" style={{ position: 'absolute', inset: 8, border: '1px solid rgba(183,154,94,.25)', borderRadius: 18, pointerEvents: 'none' }} />
+          <svg width="46" height="46" viewBox="0 0 46 46" aria-hidden="true" style={{ display: 'block', margin: '0 auto 14px' }}>
+            <circle cx="23" cy="23" r="19" fill="none" stroke="#B79A5E" strokeWidth=".6" strokeDasharray="1.5 3" />
+            <path d="M23 2 L25.2 20.8 L44 23 L25.2 25.2 L23 44 L20.8 25.2 L2 23 L20.8 20.8Z" fill="#D9B968" />
+          </svg>
+          <h1 style={{ margin: 0, textAlign: 'center', fontFamily: "'Nanum Myeongjo',serif", fontWeight: 700, fontSize: 'clamp(24px,3.4vw,38px)', lineHeight: 1.5, letterSpacing: '-0.01em', textWrap: 'balance', background: 'linear-gradient(180deg,#F2E3B8 0%,#C9A55C 100%)', WebkitBackgroundClip: 'text', backgroundClip: 'text', color: 'transparent' }}>
+            당신의 <span style={{ fontFamily: "'Nanum Brush Script','Nanum Myeongjo',serif", fontWeight: 400, fontSize: 'clamp(64px,9vw,104px)', lineHeight: 1, letterSpacing: 0, verticalAlign: '-0.08em', padding: '0 .04em', background: 'linear-gradient(180deg,#FFFFFF 0%,#EDE4CF 100%)', WebkitBackgroundClip: 'text', backgroundClip: 'text', color: 'transparent', filter: 'drop-shadow(0 2px 6px rgba(0,0,0,.35))' }}>사주</span>에 담긴 이야기를 만나보세요.
+          </h1>
+          <svg width="168" height="18" viewBox="0 0 168 18" aria-hidden="true" style={{ display: 'block', margin: '18px auto 0' }}><path d="M2 12 Q 22 2 42 10 T 82 10 T 122 10 T 166 8" stroke="#B79A5E" strokeWidth="1.2" fill="none" strokeLinecap="round" /></svg>
+        </div>
+        <p style={{ margin: '20px 0 0', fontSize: 18, lineHeight: 1.7, color: '#4A453E', maxWidth: 440 }}>타고난 기질부터 관계, 재물, 공부와 일의 흐름까지.</p>
         <div style={{ marginTop: 'clamp(24px,5vw,40px)', padding: 'clamp(16px,4vw,22px) clamp(16px,4vw,24px)', borderRadius: 20, background: 'rgba(251,248,242,.6)', border: '1px solid rgba(36,33,29,.08)', maxWidth: 460 }}>
           <p style={{ margin: '0 0 12px', fontSize: 13, fontWeight: 600, color: '#6B645A' }}>결과에서 살펴볼 여덟 가지 이야기</p>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
