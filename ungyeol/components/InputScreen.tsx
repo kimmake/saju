@@ -55,8 +55,7 @@ export default function InputScreen({ form: f, touched, submitted, formError, on
         </svg>
         <p style={{ margin: '0 0 20px', fontSize: 14, color: '#574A86', fontWeight: 600, letterSpacing: '0.02em' }}>나의 운을 읽고, 좋은 인연을 연결하다</p>
         <h1 className="serif" style={{ margin: 0, fontWeight: 800, fontSize: 'clamp(34px,4.6vw,54px)', lineHeight: 1.28, letterSpacing: '-0.03em', textWrap: 'balance' }}>당신의 사주에 담긴 이야기를 만나보세요.</h1>
-        <svg width="168" height="18" viewBox="0 0 168 18" aria-hidden="true" style={{ display: 'block', margin: '22px 0 20px' }}><path d="M2 12 Q 22 2 42 10 T 82 10 T 122 10 T 166 8" stroke="#A8833F" strokeWidth="1.4" fill="none" strokeLinecap="round" /></svg>
-        <p style={{ margin: 0, fontSize: 18, lineHeight: 1.7, color: '#4A453E', maxWidth: 440 }}>타고난 기질부터 관계, 재물, 공부와 일의 흐름까지.</p>
+        <p style={{ margin: '22px 0 0', fontSize: 18, lineHeight: 1.7, color: '#4A453E', maxWidth: 440 }}>타고난 기질부터 관계, 재물, 공부와 일의 흐름까지.</p>
         <div style={{ marginTop: 'clamp(24px,5vw,40px)', padding: 'clamp(16px,4vw,22px) clamp(16px,4vw,24px)', borderRadius: 20, background: 'rgba(251,248,242,.6)', border: '1px solid rgba(36,33,29,.08)', maxWidth: 460 }}>
           <p style={{ margin: '0 0 12px', fontSize: 13, fontWeight: 600, color: '#6B645A' }}>결과에서 살펴볼 여덟 가지 이야기</p>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
