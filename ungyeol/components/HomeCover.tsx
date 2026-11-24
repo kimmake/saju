@@ -31,7 +31,7 @@ export default function HomeCover({ savedLine, onStart, onToday, onSaju, onEdit,
           <img src="/art/books-brush.webp" alt="" aria-hidden="true" width={560} height={260} />
           <div>
             <h2>나의 사주팔자</h2>
-            <p>타고난 기질과 평생의 흐름. 자녀운·배우자운·금전운·직장운·공부운, 띠별 궁합과 2027년 운세까지 한 권으로 풀어 드려요.</p>
+            <p>타고난 기질과 평생의 흐름. 공부운·금전운·배우자운·자녀운·직장운, 띠별 궁합과 2027년 운세까지 한 권으로 풀어 드려요.</p>
           </div>
         </article>
         <article className="panel">
