@@ -4,7 +4,10 @@ import Background from '@/components/Background';
 import InputScreen from '@/components/InputScreen';
 import LoadingScreen from '@/components/LoadingScreen';
 import ResultScreen from '@/components/ResultScreen';
-import { RuleOrn, Seal } from '@/components/Ornaments';
+import { RuleOrn } from '@/components/Ornaments';
+import SiteHeader from '@/components/SiteHeader';
+import { useRouter } from 'next/navigation';
+import { loadSaved, setHandoff, takeHandoff, type BirthProfile } from '@/lib/profile';
 import { EMPTY_FORM, birthLine, toInput, type FormState } from '@/lib/form';
 import type { AnalyzeResult } from '@/lib/saju/types';
 
@@ -20,6 +23,16 @@ export default function Page() {
   const [result, setResult] = useState<AnalyzeResult | null>(null);
   const [formError, setFormError] = useState('');
   const run = useRef(0);
+  const router = useRouter();
+  // 다른 서비스에서 넘어온 정보(또는 저장에 동의한 정보)가 있으면 바로 채우지 않고 먼저 묻는다.
+  const [reuse, setReuse] = useState<{ profile: BirthProfile; source: 'today' | 'saved' } | null>(null);
+  useEffect(() => {
+    const h = takeHandoff();
+    if (h) { setReuse({ profile: h, source: 'today' }); return; }
+    const s = loadSaved();
+    if (s) setReuse({ profile: s, source: 'saved' });
+  }, []);
+  const goToday = () => { setHandoff(form); router.push('/today'); };
   const timers = useRef<ReturnType<typeof setTimeout>[]>([]);
   const clearTimers = () => { timers.current.forEach(clearTimeout); timers.current = []; };
   useEffect(() => clearTimers, []);
@@ -50,17 +63,11 @@ export default function Page() {
   return (
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', position: 'relative', isolation: 'isolate' }}>
       <Background variant={screen === 'result' ? 'result' : 'home'} />
-      <header className="site-header">
-        <button className="brand" onClick={() => { if (screen !== 'loading') { setScreen('input'); window.scrollTo(0, 0); } }} aria-label="운결 처음 화면으로">
-          <Seal />
-          <span className="brand__name">운결</span>
-          <span className="brand__han">運結</span>
-        </button>
-        <span className="site-header__note">만세력으로 읽는 사주 명리</span>
-      </header>
+      <SiteHeader current="saju" onBrand={() => { if (screen !== 'loading') { setScreen('input'); window.scrollTo(0, 0); } }} />
 
       {screen === 'input' && (
         <InputScreen form={form} touched={touched} submitted={submitted} formError={formError}
+          reuse={reuse} onReuse={() => { if (reuse) setForm(f => ({ ...f, ...reuse.profile })); setReuse(null); }} onDismissReuse={() => setReuse(null)}
           onChange={patch => setForm(f => ({ ...f, ...patch }))}
           onTouch={k => setTouched(t => ({ ...t, [k]: true }))}
           onInvalid={() => setSubmitted(true)}
@@ -71,7 +78,7 @@ export default function Page() {
         <ResultScreen result={result} title={title} birthLine={birthLine(form)} fileName={nm}
           onEdit={() => { setScreen('input'); setSubmitted(false); setTouched({}); window.scrollTo(0, 0); }}
           onRestart={() => { setScreen('input'); setForm(EMPTY_FORM); setSubmitted(false); setTouched({}); setResult(null); window.scrollTo(0, 0); }}
-          onRetry={() => startAnalysis(form)} />
+          onRetry={() => startAnalysis(form)} onToday={goToday} />
       )}
 
       <footer className="site-footer">

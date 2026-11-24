@@ -16,9 +16,9 @@ const NUM = ['一', '二', '三', '四', '五', '六', '七', '八'];
 const PILLAR_HAN: Record<string, string> = { 시주: '時柱', 일주: '日柱', 월주: '月柱', 년주: '年柱' };
 const SHORT: Record<string, string> = { children: '자녀운', spouse: '배우자운', money: '금전운', work: '직장운', match: '어울리는 띠', year: '2027년 띠', sewoon: '2027년 운세', study: '공부운' };
 
-interface Props { result: AnalyzeResult; title: string; birthLine: string; fileName: string; onEdit: () => void; onRestart: () => void; onRetry: () => void }
+interface Props { result: AnalyzeResult; title: string; birthLine: string; fileName: string; onEdit: () => void; onRestart: () => void; onRetry: () => void; onToday?: () => void }
 
-export default function ResultScreen({ result: R, title, birthLine, fileName, onEdit, onRestart, onRetry }: Props) {
+export default function ResultScreen({ result: R, title, birthLine, fileName, onEdit, onRestart, onRetry, onToday }: Props) {
   const [wide, setWide] = useState(true);
   const [active, setActive] = useState(R.sections[0].id);
   const [open, setOpen] = useState<Record<string, boolean>>({});
@@ -105,6 +105,7 @@ export default function ResultScreen({ result: R, title, birthLine, fileName, on
               <button key={n.id} onClick={() => goTo(n.id)} aria-current={n.on ? 'true' : undefined}><b aria-hidden="true">{n.no}</b>{n.short}</button>
             ))}
             <button className="link-btn toc__back" style={{ borderBottom: 0 }} onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>맨 위로</button>
+            {onToday && <button className="toc__today" onClick={onToday}><b aria-hidden="true">日</b>오늘의 운세 보기</button>}
           </nav>
         )}
 
@@ -215,6 +216,7 @@ export default function ResultScreen({ result: R, title, birthLine, fileName, on
               <button onClick={saveImage} aria-busy={saving} className="btn btn--ghost">{saveLabel}</button>
               <button onClick={onRestart} className="btn btn--primary">다시 입력하기</button>
             </div>
+            {onToday && <button onClick={onToday} className="link-btn">이 정보로 오늘의 운세 보기</button>}
             <small>명식은 공개 만세력 라이브러리로 계산하고, 해석 문장은 {R.meta.source === 'ai' ? 'AI가 명식을 근거로 작성' : '일간과 십신 분포를 규칙에 따라 풀이'}해요. 결과 이미지는 이 기기에서 바로 만들어져요.</small>
           </footer>
         </article>
