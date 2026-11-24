@@ -5,12 +5,13 @@ import type { MatchRank, Section, YearRank } from '@/lib/saju/types';
 const RANK_HAN = ['一', '二', '三'];
 const rankView = (r: MatchRank | YearRank) => ({ z: ZODIAC[r.animal], label: `${r.rank}위`, han: RANK_HAN[r.rank - 1] });
 
-interface Props { section: Section; no: string; first?: boolean; open: boolean; onToggle: () => void }
+interface Props { section: Section; no: string; first?: boolean; open: boolean; onToggle: () => void; print?: boolean }
 
 /** 해석서의 한 장(章). 카드 대신 금박 구분선과 소제목으로 나눈다. */
-export default function SectionCard({ section: s, no, first, open, onToggle }: Props) {
+export default function SectionCard({ section: s, no, first, open: openProp, onToggle, print }: Props) {
+  const open = print || openProp;
   return (
-    <section id={'sec-' + s.id} aria-labelledby={'h-' + s.id} className="chapter">
+    <section id={print ? undefined : 'sec-' + s.id} aria-labelledby={'h-' + s.id} className="chapter">
       {!first && <RuleOrn className="chapter__orn" />}
       <div className="chapter__head">
         <span aria-hidden="true" className="chapter__icon">{s.icon}</span>
@@ -36,7 +37,7 @@ export default function SectionCard({ section: s, no, first, open, onToggle }: P
           )}
           {s.details.length > 0 && (
             <div className="more">
-              <button onClick={onToggle} aria-expanded={open} aria-controls={'d-' + s.id} className="link-btn">{open ? '접기' : '더 자세히 보기'}<Chevron open={open} /></button>
+              {!print && <button onClick={onToggle} aria-expanded={open} aria-controls={'d-' + s.id} className="link-btn">{open ? '접기' : '더 자세히 보기'}<Chevron open={open} /></button>}
               {open && (
                 <dl id={'d-' + s.id} className="details">
                   {s.details.map(d => <div key={d.label}><dt>{d.label}</dt><dd>{d.text}</dd></div>)}
@@ -67,7 +68,7 @@ export default function SectionCard({ section: s, no, first, open, onToggle }: P
           </div>
           <p className="ranks-note">{s.notice}</p>
           <div className="more">
-            <button onClick={onToggle} aria-expanded={open} aria-controls={'d-' + s.id} className="link-btn">띠는 언제부터 바뀌나요?<Chevron open={open} /></button>
+            {print ? <p className="sub-h" style={{ marginTop: 8 }}><i aria-hidden="true" />띠는 언제부터 바뀌나요?</p> : <button onClick={onToggle} aria-expanded={open} aria-controls={'d-' + s.id} className="link-btn">띠는 언제부터 바뀌나요?<Chevron open={open} /></button>}
             {open && <p id={'d-' + s.id} className="boundary">{s.boundary}</p>}
           </div>
         </>

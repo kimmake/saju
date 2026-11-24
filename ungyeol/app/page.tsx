@@ -6,11 +6,13 @@ import LoadingScreen from '@/components/LoadingScreen';
 import ResultScreen from '@/components/ResultScreen';
 import DailySection from '@/components/DailySection';
 import TodayPoster from '@/components/TodayPoster';
+import ExportDoc from '@/components/ExportDoc';
+import SaveMenu, { type Privacy, type SaveKind } from '@/components/SaveMenu';
+import { exportPdf, exportPng } from '@/lib/exportImage';
 import { RuleOrn } from '@/components/Ornaments';
 import { Knot, PageFrame, SideArt, TopBar } from '@/components/Frame';
 import { EMPTY_FORM, birthLine, toInput, type FormState } from '@/lib/form';
 import { clearSaved, loadSaved, saveProfile } from '@/lib/profile';
-import { saveNodeImage } from '@/lib/saveNodeImage';
 import type { AnalyzeResult } from '@/lib/saju/types';
 import type { TodayResult } from '@/lib/saju/today';
 
@@ -45,7 +47,11 @@ export default function Page() {
   const [sajuErr, setSajuErr] = useState('');
   const [sajuLoading, setSajuLoading] = useState(false);
   const [active, setActive] = useState<'today' | 'saju'>('today');
-  const [busy, setBusy] = useState(false);
+  const [busy, setBusy] = useState<SaveKind | null>(null);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [exportKind, setExportKind] = useState<'full' | 'today' | null>(null);
+  const [privacy, setPrivacy] = useState<Privacy>({ name: true, date: true, time: true, gender: true });
+  const exportRef = useRef<HTMLDivElement>(null);
   const [msg, setMsg] = useState(''); const [msgErr, setMsgErr] = useState(false);
   const [profileMsg, setProfileMsg] = useState('');
   const [host, setHost] = useState('');
@@ -137,12 +143,32 @@ export default function Page() {
     start(form);
   };
 
-  const saveToday = async () => {
-    if (busy || !posterRef.current || !today) return;
-    setBusy(true); setMsg(''); setMsgErr(false);
-    try { setMsg(await saveNodeImage(posterRef.current, `운결_오늘의운세_${today.date.ymd}.png`, '운결 · 오늘의 운세')); }
-    catch (e) { if ((e as Error)?.name !== 'AbortError') { setMsg('이미지를 만들지 못했어요. 잠시 후 다시 시도해 주세요.'); setMsgErr(true); } }
-    finally { setBusy(false); }
+  /** 저장: 화면에 보이는 결과 데이터(today·saju)를 그대로 저장 전용 문서에 넣어 그린다. 다시 계산하지 않는다. */
+  const pick = async (k: SaveKind) => {
+    if (busy || !today) return;
+    setBusy(k); setMsg(''); setMsgErr(false);
+    const ymd = today.date.ymd, who = privacy.name && nm ? `_${nm}` : '';
+    try {
+      if (k === 'sns-png') {
+        if (!posterRef.current) throw new Error('empty');
+        setMsg(await exportPng(posterRef.current, `운결_오늘의운세_${ymd}_SNS`, '운결 · 오늘의 운세'));
+      } else {
+        const kind = k === 'today-png' ? 'today' : 'full';
+        setExportKind(kind);
+        await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));   // 저장 문서가 그려질 때까지
+        const node = exportRef.current; if (!node) throw new Error('empty');
+        const base = kind === 'today' ? `운결_오늘의운세_${ymd}${who}` : `운결_사주해석서${who}_${ymd}`;
+        setMsg(k === 'full-pdf' ? await exportPdf(node, base, '운결 · 사주 해석서') : await exportPng(node, base, kind === 'today' ? '운결 · 오늘의 운세' : '운결 · 사주 해석서'));
+      }
+    } catch (e) {
+      if ((e as Error)?.name !== 'AbortError') { setMsg('저장 파일을 만들지 못했어요. 잠시 후 다시 시도해 주세요.'); setMsgErr(true); }
+    } finally { setExportKind(null); setBusy(null); }
+  };
+  const privLine = () => {
+    const f = activeForm.current;
+    if (!privacy.date && !privacy.time && !privacy.gender) return '';
+    const parts = birthLine(f).split(' · ');   // [달력 날짜, 시간, 성별?]
+    return [privacy.date ? parts[0] : null, privacy.time ? parts[1] : null, privacy.gender && f.gender ? parts[2] : null].filter(Boolean).join(' · ');
   };
   // 공유 링크에는 출생 정보를 넣지 않는다. 받는 사람은 자신의 정보로 보게 된다.
   const shareLink = async () => {
@@ -195,7 +221,7 @@ export default function Page() {
             </div>
           </nav>
           <main className="unified">
-            {today ? <DailySection r={today} busy={busy} msg={msg} msgErr={msgErr} onSave={saveToday} onShare={shareLink} />
+            {today ? <DailySection r={today} busy={!!busy} msg={menuOpen ? '' : msg} msgErr={msgErr} onSave={() => { setMsg(''); setMenuOpen(true); }} onShare={shareLink} />
               : <section id="today" className="pending"><p>오늘의 운세를 불러오지 못했어요. {todayErr}</p><button className="btn btn--secondary" onClick={() => start(activeForm.current)}>다시 불러오기</button></section>}
 
             <div id="saju" className="part-divider">
@@ -206,7 +232,7 @@ export default function Page() {
             </div>
 
             {saju ? (
-              <ResultScreen result={saju} title={title} birthLine={birthLine(activeForm.current)} fileName={nm}
+              <ResultScreen result={saju} title={title} birthLine={birthLine(activeForm.current)} saving={!!busy} onSave={() => { setMsg(''); setMenuOpen(true); }}
                 onEdit={() => goInput(activeForm.current)}
                 onRestart={() => goInput(EMPTY_FORM)}
                 onRetry={() => fetchSaju(activeForm.current, run.current)} />
@@ -233,6 +259,10 @@ export default function Page() {
             </section>
           </main>
           {today && <TodayPoster ref={posterRef} r={today} host={host} />}
+          {exportKind && <ExportDoc ref={exportRef} kind={exportKind} today={today} saju={saju} host={host}
+            title={privacy.name && nm ? `${nm}님의 사주 이야기` : '나의 사주 이야기'} birthLine={privLine()} />}
+          <SaveMenu open={menuOpen} busy={busy} msg={msg} msgErr={msgErr} privacy={privacy} hasName={!!nm} sajuReady={!!saju}
+            onPrivacy={setPrivacy} onPick={pick} onClose={() => { if (!busy) setMenuOpen(false); }} />
         </>
       )}
 

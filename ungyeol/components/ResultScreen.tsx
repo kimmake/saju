@@ -1,9 +1,7 @@
 'use client';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import SectionCard from './SectionCard';
-import ShareCard from './ShareCard';
 import { Corners, RuleOrn } from './Ornaments';
-import { buildFontEmbedCSS } from '@/lib/fontEmbed';
 import type { AnalyzeResult, Element } from '@/lib/saju/types';
 
 /** 오행: [표기, 색, 한 글자, 한자] — 색은 브랜드 팔레트에 맞춘 차분한 먹색 계열 */
@@ -16,17 +14,13 @@ const NUM = ['一', '二', '三', '四', '五', '六', '七', '八'];
 const PILLAR_HAN: Record<string, string> = { 시주: '時柱', 일주: '日柱', 월주: '月柱', 년주: '年柱' };
 const SHORT: Record<string, string> = { children: '자녀운', spouse: '배우자운', money: '금전운', work: '직장운', match: '어울리는 띠', year: '2027년 띠', sewoon: '2027년 운세', study: '공부운' };
 
-interface Props { result: AnalyzeResult; title: string; birthLine: string; fileName: string; onEdit: () => void; onRestart: () => void; onRetry: () => void }
+interface Props { result: AnalyzeResult; title: string; birthLine: string; onEdit?: () => void; onRestart?: () => void; onRetry?: () => void; onSave?: () => void; saving?: boolean; print?: boolean }
 
-export default function ResultScreen({ result: R, title, birthLine, fileName, onEdit, onRestart, onRetry }: Props) {
+export default function ResultScreen({ result: R, title, birthLine, onEdit, onRestart, onRetry, onSave, saving, print }: Props) {
   const [active, setActive] = useState(R.sections[0].id);
   const [open, setOpen] = useState<Record<string, boolean>>({});
-  const [saving, setSaving] = useState(false);
-  const [saveMsg, setSaveMsg] = useState('');
-  const [saveErr, setSaveErr] = useState(false);
-  const cardRef = useRef<HTMLDivElement>(null);
-
   useEffect(() => {
+    if (print) return;
     const onScroll = () => {
       let cur = R.sections[0].id;
       for (const s of R.sections) { const el = document.getElementById('sec-' + s.id); if (el && el.getBoundingClientRect().top < 200) cur = s.id; }
@@ -36,7 +30,7 @@ export default function ResultScreen({ result: R, title, birthLine, fileName, on
     };
     window.addEventListener('scroll', onScroll, { passive: true });
     return () => window.removeEventListener('scroll', onScroll);
-  }, [R]);
+  }, [R, print]);
 
   const goTo = (id: string) => {
     const el = document.getElementById('sec-' + id); if (!el) return;
@@ -44,40 +38,7 @@ export default function ResultScreen({ result: R, title, birthLine, fileName, on
     setActive(id);
   };
 
-  const saveImage = useCallback(async () => {
-    if (saving) return;
-    const node = cardRef.current;
-    setSaving(true); setSaveMsg(''); setSaveErr(false);
-    try {
-      const lib = await import('html-to-image');
-      if (!node) throw new Error('no-node');
-      const opts = { pixelRatio: 2, cacheBust: true, backgroundColor: '#F5EFE2' };
-      if (document.fonts?.ready) await document.fonts.ready;
-      let fontEmbedCSS: string | undefined;
-      try { fontEmbedCSS = await buildFontEmbedCSS(node); } catch { fontEmbedCSS = undefined; }
-      let blob: Blob | null;
-      try { blob = await lib.toBlob(node, { ...opts, fontEmbedCSS }); } catch { blob = await lib.toBlob(node, { ...opts, skipFonts: true }); }
-      if (!blob) throw new Error('empty');
-      const fname = `운결_${fileName || '사주이야기'}.png`;
-      const file = new File([blob], fname, { type: 'image/png' });
-      const touch = window.matchMedia?.('(pointer: coarse)').matches;
-      if (touch && navigator.canShare?.({ files: [file] })) {
-        await navigator.share({ files: [file], title: '운결 · 사주 이야기' });
-        setSaveMsg('공유 메뉴에서 ‘이미지 저장’을 선택하면 사진첩에 저장돼요.');
-      } else {
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a'); a.href = url; a.download = fname;
-        document.body.appendChild(a); a.click(); a.remove();
-        setTimeout(() => URL.revokeObjectURL(url), 4000);
-        setSaveMsg(`‘${fname}’ 파일로 저장했어요.`);
-      }
-    } catch (e) {
-      if ((e as Error)?.name === 'AbortError') setSaveMsg('');
-      else { setSaveMsg('이미지를 만들지 못했어요. 잠시 후 다시 시도해 주세요.'); setSaveErr(true); }
-    } finally { setSaving(false); }
-  }, [saving, fileName]);
-
-  const saveLabel = saving ? '이미지 만드는 중…' : '결과 이미지 저장';
+  const saveLabel = saving ? '이미지 만드는 중…' : '결과 저장하기';
   const max = Math.max(...Object.values(R.elements), 1);
   const day = R.pillars.find(p => p.isDay);
   const navItems = R.sections.map((s, i) => ({ id: s.id, no: NUM[i], short: SHORT[s.id] || s.title, on: active === s.id }));
@@ -87,21 +48,21 @@ export default function ResultScreen({ result: R, title, birthLine, fileName, on
       <div role="status" className="notice">
         <span className="notice__label">{R.meta.label}</span>
         <span className="notice__text">{R.meta.note}</span>
-        {R.meta.interpFailed && <button onClick={onRetry} className="btn btn--primary btn--sm">해석 다시 불러오기</button>}
+        {R.meta.interpFailed && !print && <button onClick={onRetry} className="btn btn--primary btn--sm">해석 다시 불러오기</button>}
       </div>
 
       <div className="result-grid">
-        <article className="sheet report" aria-labelledby="r-title">
+        <article className="sheet report" aria-labelledby={print ? undefined : 'r-title'}>
           <Corners />
           <header className="cover">
             <div>
               <p className="kicker" style={{ margin: 0 }}>사주 해석서</p>
-              <h2 id="r-title" className="cover__title">{title}</h2>
+              <h2 id={print ? undefined : 'r-title'} className="cover__title">{title}</h2>
               <div className="cover__meta">
-                <span>{birthLine}</span>
+                {birthLine && <span>{birthLine}</span>}
                 <strong>{R.identity}</strong>
               </div>
-              <div className="cover__edit"><button onClick={onEdit} className="link-btn">정보 수정</button></div>
+              {!print && <div className="cover__edit"><button onClick={onEdit} className="link-btn">정보 수정</button></div>}
             </div>
             {day && (
               <div className="ilju">
@@ -119,15 +80,16 @@ export default function ResultScreen({ result: R, title, birthLine, fileName, on
           <ul className="keywords" aria-label="핵심 키워드">
             {R.keywords.map(k => <li key={k}># {k}</li>)}
           </ul>
-          <div className="cover-actions">
-            <button onClick={saveImage} aria-busy={saving} className="btn btn--primary">{saveLabel}</button>
-            <button onClick={onRestart} className="btn btn--secondary">다시 입력하기</button>
-          </div>
-          <p aria-live="polite" className="save-msg" data-error={saveErr}>{saveMsg}</p>
+          {!print && (
+            <div className="cover-actions">
+              <button onClick={onSave} aria-busy={saving} className="btn btn--primary">{saveLabel}</button>
+              <button onClick={onRestart} className="btn btn--secondary">다시 입력하기</button>
+            </div>
+          )}
 
           <section className="part" aria-labelledby="h-chart">
             <div className="part-head">
-              <h2 id="h-chart">사주팔자</h2><span className="part-head__han" aria-hidden="true">命式</span>
+              <h2 id={print ? undefined : 'h-chart'}>사주팔자</h2><span className="part-head__han" aria-hidden="true">命式</span>
               <span className="part-head__tag">{R.meta.chartTag}</span>
             </div>
             <div className="pillars">
@@ -150,7 +112,7 @@ export default function ResultScreen({ result: R, title, birthLine, fileName, on
 
           <section className="part" aria-labelledby="h-el">
             <div className="part-head">
-              <h2 id="h-el">오행 분포</h2><span className="part-head__han" aria-hidden="true">五行</span>
+              <h2 id={print ? undefined : 'h-el'}>오행 분포</h2><span className="part-head__han" aria-hidden="true">五行</span>
               <span className="part-head__tag">{R.meta.chartTag}</span>
             </div>
             <ul className="elements">
@@ -166,7 +128,7 @@ export default function ResultScreen({ result: R, title, birthLine, fileName, on
           </section>
           <section className="part" aria-labelledby="h-sup">
             <div className="part-head">
-              <h2 id="h-sup">보완의 길</h2><span className="part-head__han" aria-hidden="true">補完</span>
+              <h2 id={print ? undefined : 'h-sup'}>보완의 길</h2><span className="part-head__han" aria-hidden="true">補完</span>
             </div>
             <div className="supplement" style={{ marginTop: 0, borderTop: 0, paddingTop: 0 }}>
               <h3><i aria-hidden="true" />부족한 부분을 보완하려면</h3>
@@ -178,7 +140,7 @@ export default function ResultScreen({ result: R, title, birthLine, fileName, on
           </section>
 
           <div className="chapters">
-            {(
+            {!print && (
               <nav aria-label="사주 풀이 항목 바로가기" className="tabs">
                 <div className="tabs__row">
                   {navItems.map(n => (
@@ -187,22 +149,21 @@ export default function ResultScreen({ result: R, title, birthLine, fileName, on
                 </div>
               </nav>
             )}
-            {R.sections.map((s, i) => <SectionCard key={s.id} section={s} no={NUM[i]} first={i === 0} open={!!open[s.id]} onToggle={() => setOpen(o => ({ ...o, [s.id]: !o[s.id] }))} />)}
+            {R.sections.map((s, i) => <SectionCard key={s.id} section={s} no={NUM[i]} first={i === 0} open={!!open[s.id]} print={print} onToggle={() => setOpen(o => ({ ...o, [s.id]: !o[s.id] }))} />)}
           </div>
 
           <footer className="colophon">
             <RuleOrn />
             <p>사주 해석은 전통적인 해석 체계를 바탕으로 한 참고 콘텐츠입니다. 중요한 결정은 현실적인 정보와 본인의 판단을 함께 고려해 주세요.</p>
-            <div className="colophon__actions">
+            {!print && <div className="colophon__actions">
               <button onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} className="btn btn--secondary">오늘의 운세로</button>
-              <button onClick={saveImage} aria-busy={saving} className="btn btn--ghost">{saveLabel}</button>
+              <button onClick={onSave} aria-busy={saving} className="btn btn--ghost">{saveLabel}</button>
               <button onClick={onRestart} className="btn btn--primary">다시 입력하기</button>
-            </div>
-            <small>명식은 공개 만세력 라이브러리로 계산하고, 해석 문장은 {R.meta.source === 'ai' ? 'AI가 명식을 근거로 작성' : '일간과 십신 분포를 규칙에 따라 풀이'}해요. 결과 이미지는 이 기기에서 바로 만들어져요.</small>
+            </div>}
+            <small>명식은 공개 만세력 라이브러리로 계산하고, 해석 문장은 {R.meta.source === 'ai' ? 'AI가 명식을 근거로 작성' : '일간과 십신 분포를 규칙에 따라 풀이'}해요. 저장 이미지와 PDF는 이 기기에서 바로 만들어져요.</small>
           </footer>
         </article>
       </div>
-      <ShareCard ref={cardRef} result={R} title={title} birthLine={birthLine} />
     </div>
   );
 }

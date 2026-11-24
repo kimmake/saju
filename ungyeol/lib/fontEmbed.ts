@@ -22,7 +22,7 @@ export async function buildFontEmbedCSS(node: HTMLElement): Promise<string> {
   node.querySelectorAll<HTMLElement>('*').forEach(el => getComputedStyle(el).fontFamily.split(',').forEach(f => families.add(f.trim().replace(/["']/g, ''))));
   getComputedStyle(node).fontFamily.split(',').forEach(f => families.add(f.trim().replace(/["']/g, '')));
 
-  const picked: { css: string; url: string; base: string }[] = [];
+  const picked: { css: string; url: string; base: string; fmt: string }[] = [];
   for (const sheet of Array.from(document.styleSheets)) {
     let rules: CSSRuleList;
     try { rules = sheet.cssRules; } catch { continue; }
@@ -34,16 +34,16 @@ export async function buildFontEmbedCSS(node: HTMLElement): Promise<string> {
       let hit = false;
       for (const c of codes) { if (ranges.some(([a, b]) => c >= a && c <= b)) { hit = true; break; } }
       if (!hit) continue;
-      const m = /url\((['"]?)([^'")]+\.woff2[^'")]*)\1\)/.exec(rule.style.getPropertyValue('src'));
+      const m = /url\((['"]?)([^'")]+\.(woff2|woff|ttf|otf)[^'")]*)\1\)/.exec(rule.style.getPropertyValue('src'));
       if (!m) continue;
-      picked.push({ css: rule.cssText, url: m[2], base: sheet.href || location.href });
+      picked.push({ css: rule.cssText, url: m[2], base: sheet.href || location.href, fmt: ({ woff2: 'woff2', woff: 'woff', ttf: 'truetype', otf: 'opentype' } as Record<string, string>)[m[3]] });
     }
   }
   const parts = await Promise.all(picked.map(async p => {
     try {
       const abs = new URL(p.url, p.base).href;
       const data = await toDataURL(await (await fetch(abs)).blob());
-      return p.css.replace(/src:[^;]+;/, `src: url(${data}) format("woff2");`);
+      return p.css.replace(/src:[^;]+;/, `src: url(${data}) format("${p.fmt}");`);
     } catch { return ''; }
   }));
   return parts.join('\n');

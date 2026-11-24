@@ -8,17 +8,18 @@ import type { TodayResult } from '@/lib/saju/today';
 const DIR_HAN: Record<string, string> = { 동쪽: '東', 서쪽: '西', 남쪽: '南', 북쪽: '北' };
 const dirHan = (d: string) => DIR_HAN[d] ?? '中';
 
-interface Props { r: TodayResult; busy: boolean; msg: string; msgErr: boolean; onSave: () => void; onShare: () => void }
+interface Props { r: TodayResult; busy?: boolean; msg?: string; msgErr?: boolean; onSave?: () => void; onShare?: () => void; print?: boolean }
 
 /** 오늘의 운세: 매일 한 장씩 받는 운세첩. 결과 페이지 맨 위에 놓인다. */
-export default function DailySection({ r, busy, msg, msgErr, onSave, onShare }: Props) {
-  const [totalOpen, setTotalOpen] = useState(false);
+export default function DailySection({ r, busy, msg, msgErr, onSave, onShare, print }: Props) {
+  const [totalOpenS, setTotalOpen] = useState(false);
   const [openCat, setOpenCat] = useState<string | null>(null);
-  const [basisOpen, setBasisOpen] = useState(false);
+  const [basisOpenS, setBasisOpen] = useState(false);
+  const totalOpen = print || totalOpenS, basisOpen = print || basisOpenS;
   const L = r.lucky;
 
   return (
-    <section id="today" className="daily" aria-labelledby="today-title">
+    <section id={print ? undefined : 'today'} className="daily" aria-labelledby="today-title">
       <header className="daily-head">
         <div className="daily-head__land" aria-hidden="true"><img src="/art/landscape-mist.webp" alt="" width={1400} height={372} /></div>
         <p className="daily-date"><img src="/art/cloud.svg" alt="" aria-hidden="true" width={96} height={30} />{r.date.label} · {r.date.weekday}<img src="/art/cloud.svg" alt="" aria-hidden="true" width={96} height={30} /></p>
@@ -34,7 +35,7 @@ export default function DailySection({ r, busy, msg, msgErr, onSave, onShare }: 
           <div className="total__meta"><Stars score={r.total.score} label={r.total.grade} large /><span className="grade-txt">{r.total.grade}</span></div>
           <p>{r.total.summary}</p>
           <ul className="keywords" aria-label="오늘의 핵심 키워드" style={{ margin: 0 }}>{r.total.keywords.map(k => <li key={k}># {k}</li>)}</ul>
-          <button className="link-btn" style={{ alignSelf: 'flex-start' }} aria-expanded={totalOpen} aria-controls="total-more" onClick={() => setTotalOpen(o => !o)}>{totalOpen ? '총운 접기' : '총운 자세히 보기'}<Chevron open={totalOpen} /></button>
+          {!print && <button className="link-btn" style={{ alignSelf: 'flex-start' }} aria-expanded={totalOpen} aria-controls="total-more" onClick={() => setTotalOpen(o => !o)}>{totalOpen ? '총운 접기' : '총운 자세히 보기'}<Chevron open={totalOpen} /></button>}
           {totalOpen && (
             <dl id="total-more" className="total__more">
               <div><dt>오늘의 흐름</dt><dd>{r.total.flow.map((p, i) => <p key={i}>{p}</p>)}</dd></div>
@@ -53,13 +54,13 @@ export default function DailySection({ r, busy, msg, msgErr, onSave, onShare }: 
           <h2 id="h-fields" className="orn-h"><i aria-hidden="true" />분야별 운세<i aria-hidden="true" /></h2>
           <ul className="frows">
             {r.categories.map(c => {
-              const open = openCat === c.id;
+              const open = print || openCat === c.id;
               return (
                 <li key={c.id} className="frow">
                   <button aria-expanded={open} aria-controls={'fd-' + c.id} onClick={() => setOpenCat(o => (o === c.id ? null : c.id))}>
                     <span>{c.title}<small aria-hidden="true">{c.han}</small></span>
                     <Stars score={c.score} label={c.grade} />
-                    <Chevron open={open} />
+                    {!print && <Chevron open={open} />}
                   </button>
                   {open && (
                     <div id={'fd-' + c.id} className="frow__detail">
@@ -72,7 +73,7 @@ export default function DailySection({ r, busy, msg, msgErr, onSave, onShare }: 
               );
             })}
           </ul>
-          <p className="daily-note" style={{ marginTop: 8, textAlign: 'left' }}>항목을 누르면 자세한 풀이가 펼쳐져요.</p>
+          {!print && <p className="daily-note" style={{ marginTop: 8, textAlign: 'left' }}>항목을 누르면 자세한 풀이가 펼쳐져요.</p>}
         </section>
 
         <section aria-labelledby="h-lucky">
@@ -95,7 +96,7 @@ export default function DailySection({ r, busy, msg, msgErr, onSave, onShare }: 
         <ol className="medals">
           {r.matches.map(m => (
             <li key={m.rank} className="medal" data-rank={m.rank}>
-              <span className="medal__ring"><img src={`/art/zodiac/${m.animal}.webp`} alt={`${m.name} 그림`} width={400} height={400} loading="lazy" /></span>
+              <span className="medal__ring"><img src={`/art/zodiac/${m.animal}.webp`} alt={`${m.name} 그림`} width={400} height={400} loading={print ? undefined : 'lazy'} /></span>
               <span className="medal__pill">{m.rank}위 {m.name}띠</span>
             </li>
           ))}
@@ -108,14 +109,14 @@ export default function DailySection({ r, busy, msg, msgErr, onSave, onShare }: 
       </section>
 
       <section className="maxim2" aria-labelledby="h-word">
-        <div className="maxim2__land" aria-hidden="true"><img src="/art/landscape-mist.webp" alt="" width={1400} height={372} loading="lazy" /></div>
+        <div className="maxim2__land" aria-hidden="true"><img src="/art/landscape-mist.webp" alt="" width={1400} height={372} /></div>
         <h2 id="h-word" className="orn-h" style={{ color: 'var(--green)' }}><i aria-hidden="true" />오늘의 한마디<i aria-hidden="true" /></h2>
         <blockquote>“{r.word}”</blockquote>
         <Stamp ch="結" />
       </section>
 
       <div className="basis2">
-        <button className="link-btn" aria-expanded={basisOpen} aria-controls="t-basis" onClick={() => setBasisOpen(o => !o)}>이렇게 풀었어요 · 해석 범위 안내<Chevron open={basisOpen} /></button>
+        {print ? <p className="sub-h"><i aria-hidden="true" />이렇게 풀었어요 · 해석 범위 안내</p> : <button className="link-btn" aria-expanded={basisOpen} aria-controls="t-basis" onClick={() => setBasisOpen(o => !o)}>이렇게 풀었어요 · 해석 범위 안내<Chevron open={basisOpen} /></button>}
         {basisOpen && (
           <ul id="t-basis">
             <li>내 일주 {r.basis.dayPillar}({r.basis.dayPillarKo}) · 명식의 강약 {r.basis.strength} · 오늘 천간의 십성 {r.basis.stemGod} · 오늘 지지(본기)의 십성 {r.basis.branchGod}</li>
@@ -126,12 +127,16 @@ export default function DailySection({ r, busy, msg, msgErr, onSave, onShare }: 
         )}
       </div>
 
-      <div className="daily-actions">
-        <button className="btn btn--primary" onClick={onSave} aria-busy={busy}>{busy ? '이미지 만드는 중…' : '운세 이미지 저장'}</button>
-        <button className="btn btn--ghost" onClick={onShare}>링크 공유하기</button>
-      </div>
-      <p aria-live="polite" className="save-msg" data-error={msgErr} style={{ textAlign: 'center', margin: 0 }}>{msg}</p>
-      <p className="daily-note">한국 시간 매일 자정에 새 운세로 바뀌어요. 저장 이미지와 공유 링크에는 이름·생년월일·출생 시간이 들어가지 않아요.</p>
+      {!print && (
+        <>
+          <div className="daily-actions">
+            <button className="btn btn--primary" onClick={onSave} aria-busy={busy}>{busy ? '이미지 만드는 중…' : '결과 저장하기'}</button>
+            <button className="btn btn--ghost" onClick={onShare}>링크 공유하기</button>
+          </div>
+          <p aria-live="polite" className="save-msg" data-error={msgErr} style={{ textAlign: 'center', margin: 0 }}>{msg}</p>
+          <p className="daily-note">한국 시간 매일 자정에 새 운세로 바뀌어요. 공유 링크와 SNS 이미지에는 이름·생년월일·출생 시간이 들어가지 않아요.</p>
+        </>
+      )}
     </section>
   );
 }

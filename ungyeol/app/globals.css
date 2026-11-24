@@ -607,3 +607,73 @@ img { display: block; max-width: 100%; height: auto; }
 
 .sw { display: inline-flex; align-items: center; gap: 6px; margin-right: 10px; white-space: nowrap; }
 .sw i { width: 14px; height: 14px; border-radius: 50%; border: 1px solid rgba(37, 35, 31, .3); flex: none; }
+
+/* ── 결과 저장 선택 창 ── */
+.savemenu { width: min(560px, calc(100vw - 24px)); max-height: calc(100dvh - 24px); padding: 0; border: 1px solid var(--gold-line); background-color: var(--ivory); background-image: url('/art/hanji-ivory.webp'); background-size: 720px 720px; color: var(--ink); box-shadow: inset 0 0 0 5px var(--ivory), inset 0 0 0 6px var(--gold-faint); }
+.savemenu::backdrop { background: rgba(37, 35, 31, .45); }
+.savemenu__inner { padding: 22px clamp(16px, 5vw, 26px) 20px; display: flex; flex-direction: column; gap: 14px; }
+.savemenu header { text-align: center; }
+.savemenu h2 { margin: 0 0 4px; font-size: 32px; }
+.savemenu ul { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 8px; }
+.savemenu__item { width: 100%; min-height: 56px; padding: 12px 14px; text-align: left; display: flex; flex-direction: column; gap: 4px; border: 1px solid var(--line-strong); background: #FFFDF8; cursor: pointer; color: var(--ink); }
+.savemenu__item:hover:not(:disabled) { border-color: var(--navy); }
+.savemenu__item:disabled { opacity: .55; cursor: not-allowed; }
+.savemenu__item[aria-busy='true'] { opacity: 1; border-color: var(--navy); background: var(--navy-tint); }
+.savemenu__item strong { font-family: var(--font-serif); font-size: 16px; font-weight: 700; color: var(--navy); }
+.savemenu__item span { font-size: 13px; line-height: 1.6; color: var(--ink-2); }
+.savemenu__privacy { margin: 0; padding: 12px 0 0; border: 0; border-top: 1px dashed var(--line-strong); }
+.savemenu__privacy legend { padding: 12px 0 6px; font-family: var(--font-serif); font-size: 14.5px; font-weight: 700; }
+.savemenu__privacy > div { display: grid; grid-template-columns: 1fr 1fr; gap: 0 10px; }
+.savemenu__privacy .check { border: 0; padding: 0; min-height: 40px; font-size: 14.5px; }
+
+/* ── 저장 전용 문서: 화면 밖 고정 760px 판면. 뷰포트 기준 값(vw·미디어쿼리)을 고정값으로 덮는다 ── */
+.export-host { position: fixed; left: -12000px; top: 0; width: 760px; pointer-events: none; }
+.export-root { --gutter: 44px; --sheet-pad: 44px; --jump-h: 0px; position: relative; width: 760px; padding: 150px 44px 48px; background-color: var(--paper); background-image: url('/art/hanji.webp'); background-size: 720px 720px; color: var(--ink); font-family: var(--font-sans); word-break: keep-all; overflow-wrap: anywhere; display: flex; flex-direction: column; gap: 26px; }
+.export-frame { position: absolute; inset: 12px; border: 1px solid var(--gold-line); box-shadow: inset 0 0 0 4px var(--paper), inset 0 0 0 5px var(--gold-faint); pointer-events: none; }
+.export-corner { position: absolute; width: 42px; height: 42px; }
+.export-corner--0 { top: 11px; left: 11px; } .export-corner--1 { top: 11px; right: 11px; transform: scaleX(-1); }
+.export-corner--2 { bottom: 11px; left: 11px; transform: scaleY(-1); } .export-corner--3 { bottom: 11px; right: 11px; transform: scale(-1, -1); }
+.export-pine { position: absolute; top: 14px; left: 14px; width: 300px; opacity: .85; }
+.export-sun { position: absolute; top: 46px; right: 60px; width: 64px; opacity: .85; }
+.export-head { position: absolute; top: 34px; left: 0; right: 0; display: flex; flex-direction: column; align-items: center; gap: 2px; }
+.export-brand { position: relative; font-size: 58px; line-height: 1.1; }
+.export-brand .stamp { position: absolute; right: -.62em; bottom: .2em; font-size: 26px; }
+.export-han { font-family: var(--font-serif); font-size: 13px; letter-spacing: .3em; color: var(--gold-text); }
+.export-foot { display: flex; flex-direction: column; align-items: center; gap: 10px; text-align: center; padding-top: 6px; }
+.export-foot p { margin: 0; max-width: 560px; font-size: 12.5px; line-height: 1.7; color: var(--ink-3); }
+.export-foot .export-sign { display: flex; align-items: center; gap: 8px; font-family: var(--font-serif); font-size: 13px; color: var(--ink-2); }
+.export-sign .brush { font-size: 22px; color: var(--ink); }
+.export-sign .stamp { font-size: 24px; }
+.export-root .daily { gap: 24px; }
+.export-root .daily-head__land { top: 22px; height: 150px; }
+.export-root .daily-date { font-size: 16px; } .export-root .daily-date img { width: 64px; }
+.export-root .daily-head h1 { font-size: 64px; } .export-root .daily-head h1 .stamp { font-size: 36px; }
+.export-root .total { grid-template-columns: 66px minmax(0, 1fr); }
+.export-root .total__label { font-size: 30px; }
+.export-root .total__body { padding: 18px 22px; } .export-root .total__body h2 { font-size: 23px; }
+.export-root .twin { grid-template-columns: minmax(0, 1.08fr) minmax(0, 1fr); gap: 0; }
+.export-root .twin > * + * { border-left: 1px solid var(--gold-faint); padding-left: 20px; } .export-root .twin > :first-child { padding-right: 20px; }
+.export-root .maxim2 { padding: 30px 40px 54px; } .export-root .maxim2 blockquote { font-size: 20px; }
+.export-root .medal__ring { width: 118px; }
+.export-root .part-divider h2 { font-size: 44px; }
+.export-root .unified, .export-root .result { padding: 0; max-width: none; }
+.export-root .notice { padding: 10px 0; }
+.export-root .report { --sheet-pad: 44px; padding: 52px 44px 48px; }
+.export-root .cover { grid-template-columns: minmax(0, 1fr) auto; gap: 36px; text-align: left; justify-items: stretch; }
+.export-root .cover .ilju { order: 0; justify-self: end; }
+.export-root .cover__title { font-size: 44px; } .export-root .ilju__ring { width: 150px; } .export-root .ilju__han { font-size: 36px; }
+.export-root .quote { margin-top: 36px; } .export-root .quote p { font-size: 21px; }
+.export-root .part { margin-top: 56px; } .export-root .part-head h2 { font-size: 23px; }
+.export-root .pillar__char { font-size: 40px; }
+.export-root .supplement dl { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.export-root .chapters { margin-top: 60px; } .export-root .chapter { padding-top: 32px; } .export-root .chapter + .chapter { margin-top: 28px; }
+.export-root .chapter__orn { margin-bottom: 34px; } .export-root .chapter__head { gap: 20px; }
+.export-root .chapter__icon { width: 62px; font-size: 32px; } .export-root .chapter__title { font-size: 28px; }
+.export-root .chapter__summary { font-size: 18px; } .export-root .chapter__body p { font-size: 16.5px; }
+.export-root .details div { grid-template-columns: 190px minmax(0, 1fr); gap: 22px; }
+.export-root .ranks--cols { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.export-root .ranks--cols .rank + .rank { border-top: 0; border-left: 1px solid var(--line); }
+.export-root .rank { padding: 22px 16px; }
+.export-root .yrank { grid-template-columns: 170px repeat(3, minmax(0, 1fr)); }
+.export-root .colophon { margin-top: 64px; }
+.export-root .boundary, .export-root .details, .export-root .frow__detail, .export-root .total__more, .export-root .basis2 ul { animation: none; }
