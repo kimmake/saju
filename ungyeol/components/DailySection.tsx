@@ -23,7 +23,7 @@ export default function DailySection({ r, busy, msg, msgErr, onSave, onShare, pr
       <header className="daily-head">
         <div className="daily-head__land" aria-hidden="true"><img src="/art/landscape-mist.webp" alt="" width={1400} height={372} /></div>
         <p className="daily-date"><img src="/art/cloud.svg" alt="" aria-hidden="true" width={96} height={30} />{r.date.label} · {r.date.weekday}<img src="/art/cloud.svg" alt="" aria-hidden="true" width={96} height={30} /></p>
-        <h1 id="today-title" className="brush">오늘의 운세<Stamp /></h1>
+        <h1 id="today-title" className="brush"><span>오늘의 운세</span><Stamp /></h1>
         <p className="daily-iljin">{r.date.lunar} · 오늘의 일진 <b>{r.date.ganzhi}日</b> ({r.date.ganzhiKo}일)</p>
         <Knot />
       </header>

@@ -17,7 +17,7 @@ const RENDER_SIDE = 16_000;
 /** 저장 파일 한도: iOS Safari는 캔버스 약 1,670만 화소, 그 밖은 한 변 32,000px · 1.2억 화소 안쪽 */
 function outputLimit() {
   const forced = (window as unknown as { __ungyeolMaxPixels?: number }).__ungyeolMaxPixels;
-  return { area: forced ?? (isIOS() ? 16_000_000 : 120_000_000), side: isIOS() ? 16_000 : 32_000 };
+  return { area: forced ?? (isIOS() ? 16_000_000 : 120_000_000), side: isIOS() ? 16_000 : 32_700 };
 }
 const debug = (...a: unknown[]) => { if ((window as unknown as { __ungyeolDebug?: boolean }).__ungyeolDebug) console.log('[export]', ...a); };
 
@@ -37,16 +37,17 @@ function breakPoints(node: HTMLElement): number[] {
   return [...pts].sort((a, b) => a - b);
 }
 
-/** 최대 높이 maxH 안에서 가장 늦은 자를 위치를 골라 [시작, 끝) 구간들로 나눈다. */
-function plan(total: number, maxH: number, pts: number[], minFill = 0.55): [number, number][] {
-  const out: [number, number][] = []; let y = 0;
-  while (total - y > maxH) {
-    const limit = y + maxH;
-    const cand = pts.filter(p => p > y + maxH * minFill && p <= limit);
-    const cut = cand.length ? cand[cand.length - 1] : limit;
+/** 전체 높이를 maxH 이하의 고른 구간들로 나눈다. 각 구간 끝은 목표 지점에 가장 가까운 자를 위치(섹션 경계)로 잡아, 아주 짧은 꼬리 구간이 생기지 않게 한다. */
+function plan(total: number, maxH: number, pts: number[], from = 0): [number, number][] {
+  const out: [number, number][] = []; let y = from; const end = from + total;
+  while (end - y > maxH) {
+    const left = Math.ceil((end - y) / maxH);            // 남은 구간 수
+    const target = y + (end - y) / left, limit = y + maxH;
+    const cand = pts.filter(p => p > y + maxH * 0.3 && p <= limit);
+    const cut = cand.length ? cand.reduce((a, b) => (Math.abs(b - target) < Math.abs(a - target) ? b : a)) : Math.min(limit, Math.round(target));
     out.push([y, cut]); y = cut;
   }
-  out.push([y, total]);
+  out.push([y, end]);
   return out;
 }
 
@@ -64,18 +65,29 @@ export async function renderNode(node: HTMLElement, ratio = 2): Promise<Rendered
   if (!width || !total) throw new Error('empty');
   debug('ready', width, total);
   const lim = outputLimit();
-  const maxH = Math.floor(Math.min(RENDER_SIDE, lim.side, lim.area / (width * ratio)) / ratio);
+  const outMaxH = Math.floor(Math.min(lim.side, lim.area / (width * ratio)) / ratio);   // 파일 한 장의 최대 높이(CSS px)
   const points = breakPoints(node);
-  const ranges = plan(total, maxH, points);
+  const ranges = plan(total, outMaxH, points);
   const canvases: HTMLCanvasElement[] = [];
-  for (const [y0, y1] of ranges) {
+  const draw = async (y0: number, y1: number) => {
     const opts = {
       pixelRatio: ratio, backgroundColor: PAPER, fontEmbedCSS, cacheBust: false,
       width, height: y1 - y0, canvasWidth: width, canvasHeight: y1 - y0,
       style: { transform: `translateY(${-y0}px)`, transformOrigin: 'top left', margin: '0' },
     };
     if (isWebKitOnly() && !canvases.length) { try { await lib.toCanvas(node, opts); } catch { /* Safari 첫 렌더 예열 */ } }
-    const t = performance.now(); canvases.push(await lib.toCanvas(node, opts)); debug('chunk', y0, y1, Math.round(performance.now() - t) + 'ms');
+    const t = performance.now(); const c = await lib.toCanvas(node, opts); debug('chunk', y0, y1, Math.round(performance.now() - t) + 'ms');
+    return c;
+  };
+  for (const [a, b] of ranges) {
+    const parts = plan(b - a, Math.floor(RENDER_SIDE / ratio), points.filter(p => p > a && p < b), a);
+    const cs: HTMLCanvasElement[] = [];
+    for (const [y0, y1] of parts) cs.push(await draw(y0, y1));
+    if (cs.length === 1) { canvases.push(cs[0]); continue; }
+    const out = document.createElement('canvas'); out.width = cs[0].width; out.height = cs.reduce((h, c) => h + c.height, 0);
+    const ctx = out.getContext('2d')!; let y = 0;
+    for (const c of cs) { ctx.drawImage(c, 0, y); y += c.height; }
+    canvases.push(out);
   }
   if (!canvases.length || canvases.some(c => !c.width || !c.height)) throw new Error('empty');
   return { canvases, ratio, width, ranges, points };
@@ -100,30 +112,24 @@ export async function deliver(files: File[], title: string): Promise<string> {
   return files.length > 1 ? `결과가 길어 ${files.length}장의 이미지로 나눠 저장했어요. (${files[0].name} 외)` : `‘${files[0].name}’ 파일로 저장했어요.`;
 }
 
-/** 조각 캔버스들을 저장 한도 안에서 최대한 길게 이어 붙인다 (섹션 경계에서만 나뉜다). */
-function stitch(r: Rendered): HTMLCanvasElement[] {
-  const lim = outputLimit(), W = r.canvases[0].width;
-  const maxH = Math.min(lim.side, Math.floor(lim.area / W));
-  const groups: HTMLCanvasElement[][] = [[]]; let h = 0;
-  for (const c of r.canvases) {
-    if (h + c.height > maxH && groups[groups.length - 1].length) { groups.push([]); h = 0; }
-    groups[groups.length - 1].push(c); h += c.height;
-  }
-  return groups.map(g => {
-    if (g.length === 1) return g[0];
-    const out = document.createElement('canvas'); out.width = W; out.height = g.reduce((a, c) => a + c.height, 0);
-    const ctx = out.getContext('2d')!; let y = 0;
-    for (const c of g) { ctx.drawImage(c, 0, y); y += c.height; }
-    return out;
-  });
-}
-
 /** PNG로 저장: 한 장에 담기면 한 장, 기기 한도를 넘으면 섹션 경계에서 나눈 여러 장 */
 export async function exportPng(node: HTMLElement, base: string, title: string): Promise<string> {
-  const outs = stitch(await renderNode(node));
+  const outs = (await renderNode(node)).canvases;
   const n = outs.length;
   const files = await Promise.all(outs.map(async (c, i) => new File([await toBlob(c)], n > 1 ? `${base}_${i + 1}of${n}.png` : `${base}.png`, { type: 'image/png' })));
   return deliver(files, title);
+}
+
+/** PDF 쪽 나누기: 쪽마다 최대한 채우되(60% 이상) 섹션 경계에서 자른다. */
+function planPages(total: number, maxH: number, pts: number[]): [number, number][] {
+  const out: [number, number][] = []; let y = 0;
+  while (total - y > maxH) {
+    const cand = pts.filter(p => p > y + maxH * 0.6 && p <= y + maxH);
+    const cut = cand.length ? cand[cand.length - 1] : y + maxH;
+    out.push([y, cut]); y = cut;
+  }
+  out.push([y, total]);
+  return out;
 }
 
 /** A4 PDF로 저장: 그린 캔버스를 섹션 경계에서 A4 비율로 다시 잘라 쪽마다 넣는다. */
@@ -137,7 +143,7 @@ export async function exportPdf(node: HTMLElement, base: string, title: string):
   r.canvases.forEach((canvas, ci) => {
     const [y0, y1] = r.ranges[ci];
     const pts = r.points.filter(p => p > y0 && p < y1).map(p => p - y0);
-    for (const [a, b] of plan(y1 - y0, pageCss, pts, 0.6)) {
+    for (const [a, b] of planPages(y1 - y0, pageCss, pts)) {
       const slice = document.createElement('canvas');
       slice.width = canvas.width; slice.height = Math.round((b - a) * r.ratio);
       const ctx = slice.getContext('2d')!;
