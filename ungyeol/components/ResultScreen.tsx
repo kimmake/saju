@@ -16,10 +16,9 @@ const NUM = ['一', '二', '三', '四', '五', '六', '七', '八'];
 const PILLAR_HAN: Record<string, string> = { 시주: '時柱', 일주: '日柱', 월주: '月柱', 년주: '年柱' };
 const SHORT: Record<string, string> = { children: '자녀운', spouse: '배우자운', money: '금전운', work: '직장운', match: '어울리는 띠', year: '2027년 띠', sewoon: '2027년 운세', study: '공부운' };
 
-interface Props { result: AnalyzeResult; title: string; birthLine: string; fileName: string; onEdit: () => void; onRestart: () => void; onRetry: () => void; onToday?: () => void }
+interface Props { result: AnalyzeResult; title: string; birthLine: string; fileName: string; onEdit: () => void; onRestart: () => void; onRetry: () => void }
 
-export default function ResultScreen({ result: R, title, birthLine, fileName, onEdit, onRestart, onRetry, onToday }: Props) {
-  const [wide, setWide] = useState(true);
+export default function ResultScreen({ result: R, title, birthLine, fileName, onEdit, onRestart, onRetry }: Props) {
   const [active, setActive] = useState(R.sections[0].id);
   const [open, setOpen] = useState<Record<string, boolean>>({});
   const [saving, setSaving] = useState(false);
@@ -28,15 +27,9 @@ export default function ResultScreen({ result: R, title, birthLine, fileName, on
   const cardRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const onResize = () => setWide(window.innerWidth >= 980);
-    onResize();
-    window.addEventListener('resize', onResize);
-    return () => window.removeEventListener('resize', onResize);
-  }, []);
-  useEffect(() => {
     const onScroll = () => {
       let cur = R.sections[0].id;
-      for (const s of R.sections) { const el = document.getElementById('sec-' + s.id); if (el && el.getBoundingClientRect().top < 160) cur = s.id; }
+      for (const s of R.sections) { const el = document.getElementById('sec-' + s.id); if (el && el.getBoundingClientRect().top < 200) cur = s.id; }
       // 맨 아래까지 내리면 마지막 장이 화면 위쪽에 닿지 못하므로 마지막 장을 표시한다.
       if (window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 4) cur = R.sections[R.sections.length - 1].id;
       setActive(cur);
@@ -47,7 +40,7 @@ export default function ResultScreen({ result: R, title, birthLine, fileName, on
 
   const goTo = (id: string) => {
     const el = document.getElementById('sec-' + id); if (!el) return;
-    window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - (wide ? 24 : 72), behavior: 'smooth' });
+    window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - 112, behavior: 'smooth' });
     setActive(id);
   };
 
@@ -90,7 +83,7 @@ export default function ResultScreen({ result: R, title, birthLine, fileName, on
   const navItems = R.sections.map((s, i) => ({ id: s.id, no: NUM[i], short: SHORT[s.id] || s.title, on: active === s.id }));
 
   return (
-    <main className="result">
+    <div className="result">
       <div role="status" className="notice">
         <span className="notice__label">{R.meta.label}</span>
         <span className="notice__text">{R.meta.note}</span>
@@ -98,23 +91,12 @@ export default function ResultScreen({ result: R, title, birthLine, fileName, on
       </div>
 
       <div className="result-grid">
-        {wide && (
-          <nav aria-label="결과 항목 바로가기" className="toc">
-            <p className="toc__title">여덟 가지 이야기</p>
-            {navItems.map(n => (
-              <button key={n.id} onClick={() => goTo(n.id)} aria-current={n.on ? 'true' : undefined}><b aria-hidden="true">{n.no}</b>{n.short}</button>
-            ))}
-            <button className="link-btn toc__back" style={{ borderBottom: 0 }} onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>맨 위로</button>
-            {onToday && <button className="toc__today" onClick={onToday}><b aria-hidden="true">日</b>오늘의 운세 보기</button>}
-          </nav>
-        )}
-
         <article className="sheet report" aria-labelledby="r-title">
           <Corners />
           <header className="cover">
             <div>
               <p className="kicker" style={{ margin: 0 }}>사주 해석서</p>
-              <h1 id="r-title" className="cover__title">{title}</h1>
+              <h2 id="r-title" className="cover__title">{title}</h2>
               <div className="cover__meta">
                 <span>{birthLine}</span>
                 <strong>{R.identity}</strong>
@@ -196,8 +178,8 @@ export default function ResultScreen({ result: R, title, birthLine, fileName, on
           </section>
 
           <div className="chapters">
-            {!wide && (
-              <nav aria-label="결과 항목 바로가기" className="tabs">
+            {(
+              <nav aria-label="사주 풀이 항목 바로가기" className="tabs">
                 <div className="tabs__row">
                   {navItems.map(n => (
                     <button key={n.id} onClick={() => goTo(n.id)} aria-current={n.on ? 'true' : undefined}><b aria-hidden="true">{n.no}</b>{n.short}</button>
@@ -212,16 +194,15 @@ export default function ResultScreen({ result: R, title, birthLine, fileName, on
             <RuleOrn />
             <p>사주 해석은 전통적인 해석 체계를 바탕으로 한 참고 콘텐츠입니다. 중요한 결정은 현실적인 정보와 본인의 판단을 함께 고려해 주세요.</p>
             <div className="colophon__actions">
-              <button onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} className="btn btn--secondary">맨 위로</button>
+              <button onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} className="btn btn--secondary">오늘의 운세로</button>
               <button onClick={saveImage} aria-busy={saving} className="btn btn--ghost">{saveLabel}</button>
               <button onClick={onRestart} className="btn btn--primary">다시 입력하기</button>
             </div>
-            {onToday && <button onClick={onToday} className="link-btn">이 정보로 오늘의 운세 보기</button>}
             <small>명식은 공개 만세력 라이브러리로 계산하고, 해석 문장은 {R.meta.source === 'ai' ? 'AI가 명식을 근거로 작성' : '일간과 십신 분포를 규칙에 따라 풀이'}해요. 결과 이미지는 이 기기에서 바로 만들어져요.</small>
           </footer>
         </article>
       </div>
       <ShareCard ref={cardRef} result={R} title={title} birthLine={birthLine} />
-    </main>
+    </div>
   );
 }

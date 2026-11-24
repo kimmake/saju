@@ -27,16 +27,18 @@ const POS = ['시지', '일지', '월지', '년지'];
 const POS_MEAN = ['미래·자녀의 자리', '나와 가까운 관계의 자리', '일과 사회의 자리', '바깥 환경의 자리'];
 
 export type CategoryId = 'love' | 'money' | 'work' | 'study' | 'health' | 'people';
-export interface TodayCategory { id: CategoryId; title: string; han: string; score: number; grade: string; text: string; tip: string }
+export interface TodayCategory { id: CategoryId; title: string; han: string; score: number; grade: string; keyword: string; text: string; tip: string }
 export interface TodayMatch { rank: number; animal: string; hanja: string; name: string; reason: string; advice: string }
 export interface TodayResult {
   date: { ymd: string; label: string; weekday: string; lunar: string; ganzhi: string; ganzhiKo: string; stemEl: Element; branchEl: Element; animal: string; nextRefreshAt: string };
   basis: { dayPillar: string; dayPillarKo: string; strength: string; stemGod: string; branchGod: string; relations: string[]; luckyElement: string };
-  total: { score: number; grade: string; headline: string; flow: string[]; keywords: string[]; caution: string; action: string };
+  total: { score: number; grade: string; headline: string; summary: string; flow: string[]; keywords: string[]; chance: string; caution: string; action: string; advice: string };
   categories: TodayCategory[];
   lucky: { element: Element; elementLabel: string; colors: { name: string; hex: string }[]; numbers: number[]; direction: string; time: { name: string; range: string }; item: string; action: string; note: string };
   matches: TodayMatch[];
   word: string;
+  /** 입력 정보가 부족해 해석 범위가 줄어든 부분 */
+  scope: string[];
   notes: string[];
 }
 
@@ -91,6 +93,46 @@ const GOD_ACTION: Record<string, string> = {
   정관: '약속과 마감을 지키는 데 집중해 신뢰를 쌓아 보세요.',
   편인: '새로운 분야의 글이나 강의를 하나 찾아보세요.',
   정인: '책을 읽거나 조언을 구하며 배움의 시간을 가져 보세요.',
+};
+// 하루를 대표하는 한 문장 (십성 × 흐름 낮음·보통·높음)
+const HEADLINE: Record<string, [string, string, string]> = {
+  비견: ['한 걸음 물러서 나를 지키는 날', '내 속도로 단단히 걷는 날', '스스로 정한 길에 힘이 실리는 날'],
+  겁재: ['경쟁보다 나눔이 이로운 날', '함께 달리며 힘을 얻는 날', '도전에 추진력이 붙는 날'],
+  식신: ['미룬 일 하나만 끝내도 충분한 날', '즐거움 속에서 힘이 나는 날', '손끝에서 좋은 것이 피어나는 날'],
+  상관: ['말의 온도를 살피는 날', '재치가 분위기를 밝히는 날', '생각을 드러내면 길이 열리는 날'],
+  편재: ['넓히기보다 다지는 날', '작은 변화가 기회를 부르는 날', '움직인 만큼 기회가 오는 날'],
+  정재: ['지키는 것이 버는 것인 날', '차근차근 실속을 쌓는 날', '성실함이 실속으로 돌아오는 날'],
+  편관: ['서두르지 않아야 길한 날', '긴장 속에서 결단이 빛나는 날', '어려운 일을 넘어서는 날'],
+  정관: ['완벽보다 완료를 택하는 날', '질서 속에서 차분히 쌓는 날', '원칙이 신뢰로 돌아오는 날'],
+  편인: ['생각을 행동으로 옮겨 보는 날', '새로운 생각이 스치는 날', '직관이 길을 밝히는 날'],
+  정인: ['쉬어 가며 채우는 날', '배움이 가까이 있는 날', '좋은 도움이 닿는 날'],
+};
+const GOD_CHANCE: Record<string, string> = {
+  비견: '오랜 동료나 친구와 힘을 합치면 혼자서는 어려웠던 일이 풀릴 수 있어요.',
+  겁재: '경쟁이 붙은 자리에서 평소보다 큰 힘을 낼 수 있어요. 목표를 분명히 세워 두세요.',
+  식신: '취미나 손재주가 뜻밖의 칭찬이나 제안으로 이어질 수 있어요.',
+  상관: '회의나 대화에서 꺼낸 아이디어가 눈에 띌 수 있어요.',
+  편재: '새로운 사람이나 낯선 장소에서 생각지 못한 기회를 만날 수 있어요.',
+  정재: '꼼꼼히 챙긴 일이 신뢰와 실속으로 돌아올 수 있어요.',
+  편관: '부담스러웠던 역할이 오히려 실력을 보여 줄 기회가 될 수 있어요.',
+  정관: '약속과 원칙을 지킨 모습이 주변의 신뢰로 이어질 수 있어요.',
+  편인: '새로운 분야의 글이나 대화에서 좋은 영감을 얻을 수 있어요.',
+  정인: '조언을 구하면 생각보다 좋은 도움을 받을 수 있어요.',
+};
+const DAILY_ADVICE: Record<Group, string> = {
+  비겁: '하루 일과 중 나만을 위한 20분을 따로 떼어 두세요.',
+  식상: '오늘 좋았던 일 한 가지를 짧게 적거나 누군가에게 이야기해 보세요.',
+  재성: '지갑과 일정표를 한 번씩 정리하며 하루를 시작해 보세요.',
+  관성: '할 일 목록에서 가장 중요한 하나에 먼저 표시해 두세요.',
+  인성: '잠들기 전 10분, 책 몇 쪽을 읽거나 하루를 돌아보세요.',
+};
+const CAT_KEY: Record<CategoryId, Record<Group, string>> = {
+  love: { 비겁: '대등한 관계', 식상: '다정한 표현', 재성: '함께하는 시간', 관성: '믿음과 예의', 인성: '경청과 배려' },
+  money: { 비겁: '나눔의 기준', 식상: '재능의 실속', 재성: '정산과 기록', 관성: '정해진 지출', 인성: '배움에 쓰는 돈' },
+  work: { 비겁: '주도적 추진', 식상: '아이디어', 재성: '성과 정리', 관성: '역할과 평가', 인성: '준비와 계획' },
+  study: { 비겁: '혼자 몰입', 식상: '설명하며 익히기', 재성: '실전 문제', 관성: '계획과 마감', 인성: '깊은 이해' },
+  health: { 비겁: '쉬는 시간', 식상: '가벼운 움직임', 재성: '끼니 챙기기', 관성: '긴장 풀기', 인성: '충분한 잠' },
+  people: { 비겁: '동료와 협력', 식상: '즐거운 대화', 재성: '실속 있는 만남', 관성: '예의와 신뢰', 인성: '조언과 도움' },
 };
 const GROUP_KEY: Record<Group, string> = { 비겁: '주관', 식상: '표현', 재성: '실속', 관성: '책임', 인성: '배움' };
 const GOD_KEY: Record<string, string> = { 비견: '자립', 겁재: '추진', 식신: '여유', 상관: '재치', 편재: '기회', 정재: '성실', 편관: '결단', 정관: '신뢰', 편인: '직관', 정인: '도움' };
@@ -293,7 +335,7 @@ export function todayFortune(input: SajuInput, ymd: string, nextRefreshAt = ''):
   const categories: TodayCategory[] = ids.map(id => {
     const s = scores[id], [lead, tip] = CAT_LEVEL[id][lvl(s)];
     const parts = [CAT_BASE[id][sG], relLine(id), lead].filter(Boolean);
-    return { id, ...CAT_META[id], score: s, grade: GRADE[s], text: parts.join(' '), tip };
+    return { id, ...CAT_META[id], score: s, grade: GRADE[s], keyword: CAT_KEY[id][sG], text: parts.join(' '), tip };
   });
 
   // ── 총운 ──
@@ -352,18 +394,27 @@ export function todayFortune(input: SajuInput, ymd: string, nextRefreshAt = ''):
   return {
     date: todayDate(ymd, nextRefreshAt),
     basis: { dayPillar: chart.gz.day, dayPillarKo: `${STEM[chart.gz.day[0]][0]}${BRANCH[chart.gz.day[1]][0]}`, strength: A.strength === 'strong' ? '신강(身強) 쪽' : A.strength === 'weak' ? '신약(身弱) 쪽' : '중화(中和)에 가까움', stemGod, branchGod, relations, luckyElement: elLabel(lucky) },
-    total: { score: total, grade: GRADE[total], headline: `${GOD_DAY[stemGod]}이에요.`, flow, keywords, caution, action },
+    total: {
+      score: total, grade: GRADE[total], headline: HEADLINE[stemGod][lvl(total)], summary: `${GOD_DAY[stemGod]}이에요.${highCat.score >= 4 ? ` 분야 가운데서는 ${highCat.title}이 가장 돋보여요.` : lowCat.score <= 2 ? ` ${lowCat.title}은 한 번 더 살펴 주세요.` : ' 분야별로 큰 기복 없이 고른 하루예요.'}`,
+      flow, keywords,
+      chance: GOD_CHANCE[stemGod] + (anyRel('liuhe') || stemHe || shHave.length ? ' 오늘은 명식과 합(合)을 이루는 기운이 있어 주변의 도움도 기대해 볼 만해요.' : ''),
+      caution, action, advice: DAILY_ADVICE[sG],
+    },
     categories,
     lucky: { element: lucky, elementLabel: elLabel(lucky), colors, numbers: L.numbers, direction: L.direction, time: { name: `${tPick}時`, range: SIJIN[tPick] }, item: luckyItem, action: luckyAction,
       note: `${strengthTxt}이라 ${luckyReason} 가운데, 오늘 일진의 오행까지 더했을 때 가장 부족한 ${elLabel(lucky)}${batchim(EL_KO[lucky]) ? '을' : '를'} 오늘의 행운 오행으로 골랐어요. 색·숫자·방향·시간은 전통 오행 배속(오방색·하도의 수·방위·십이시진)에 따른 상징이에요.` },
     matches,
     word,
+    scope: [
+      ...(input.time ? [] : ['태어난 시간을 몰라 시주를 뺀 여섯 글자로 풀었어요. 시지(時支)와 오늘 지지의 합·충은 보지 않았고, 강약과 오행 판단도 덜 정밀할 수 있어요.']),
+      ...(input.gender ? [] : ['성별을 선택하지 않아 애정운의 배우자 별은 재성과 관성을 함께 참고했어요.']),
+    ],
     notes: [
       '오늘의 일진은 한국 시간(Asia/Seoul) 자정 기준 날짜의 일주(日柱)예요. 자시(밤 11시)부터 다음 날로 보는 방식은 적용하지 않았어요.',
       '명식은 ‘나의 사주팔자’와 같은 만세력 계산을 쓰고, 일간 기준 오늘 천간·지지(본기)의 십성, 명식 지지와의 합·충, 일간과의 천간합·충, 오행 분포를 규칙에 따라 더해 풀이했어요.',
       '강약은 천간·지지의 십성 개수와 지장간을 단순하게 센 값이에요. 용신(用神)을 정밀하게 정하거나 대운·세운·월운을 함께 본 풀이는 아니에요.',
       '분야별 등급은 사건을 예측하지 않는 참고 지표이고, 건강운은 질병을 예측하거나 진단하지 않는 일상 관리 조언이에요.',
-      '전통 명리학의 해석 체계를 바탕으로 한 참고용 콘텐츠예요. 중요한 결정은 현실적인 정보와 본인의 판단을 함께 고려해 주세요.',
+      '전통 명리학의 해석 체계를 바탕으로 한 참고용·오락용 콘텐츠이며, 과학적으로 검증된 예측이나 확률이 아니에요. 중요한 결정은 현실적인 정보와 본인의 판단을 함께 고려해 주세요.',
     ],
   };
 }

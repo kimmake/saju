@@ -17,6 +17,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         {/* crossOrigin: 결과 이미지 저장 때 글꼴 규칙(cssRules)을 읽기 위해 필요 */}
         <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;600;700&family=Song+Myung&display=swap" rel="stylesheet" crossOrigin="anonymous" />
         <link rel="preload" as="image" href="/art/hanji.webp" />
+        <link rel="preload" as="font" href="/fonts/chosungs-normal.woff" type="font/woff" crossOrigin="" />
       </head>
       <body>{children}</body>
     </html>
