@@ -448,7 +448,9 @@ img { display: block; max-width: 100%; height: auto; }
 .cover-head { position: relative; margin-top: clamp(92px, 26vw, 150px); display: flex; flex-direction: column; align-items: center; gap: 8px; }
 .cover-head__kicker { margin: 0; font-family: var(--font-serif); font-size: clamp(14px, 3.8vw, 16px); color: var(--ink-2); letter-spacing: .08em; }
 .cover-head h1 { position: relative; margin: 0; font-size: clamp(82px, 26vw, 128px); line-height: 1.05; letter-spacing: .02em; color: var(--ink); }
-.cover-head h1 .stamp { position: absolute; right: -0.62em; bottom: .28em; font-size: clamp(34px, 9vw, 46px); }
+/* 낙관은 글자 위에 얹지 않고 글자 뒤에 이어 찍는다. 왼쪽에 같은 폭을 비워 제목을 가운데에 둔다. */
+.cover-head h1 { --st: clamp(30px, 8.4vw, 44px); display: inline-flex; align-items: flex-end; padding-left: calc(var(--st) * 1.25 + 12px); }
+.cover-head h1 .stamp { position: static; flex: none; font-size: var(--st); margin: 0 0 .32em 12px; }
 .cover-head__sub { margin: 4px 0 0; font-family: var(--font-serif); font-size: clamp(14px, 3.8vw, 16px); color: var(--ink-2); }
 .cover-head__sub b { font-weight: 600; color: var(--gold-text); letter-spacing: .3em; margin-right: 8px; }
 .cover-land { width: calc(100% + 2 * var(--gutter)); margin: 6px calc(-1 * var(--gutter)) 0; height: clamp(120px, 34vw, 190px); overflow: hidden; }
@@ -495,7 +497,8 @@ img { display: block; max-width: 100%; height: auto; }
 .entry-panel .segment button[aria-checked='true']::before, .entry-panel .grid-3 .choice[aria-checked='true']::before { background: var(--navy); border-color: var(--navy); }
 .entry-panel .grid-3 .choice { padding: 0 8px; gap: 7px; font-size: 14.5px; white-space: nowrap; }
 .entry-panel .grid-3 .choice::before { width: 16px; height: 16px; }
-@media (max-width: 360px) { .entry-panel .grid-3 .choice { gap: 6px; padding: 0 8px; font-size: 14px; } .entry-panel .grid-3 .choice::before { width: 14px; height: 14px; } }
+/* 좁은 화면: 여성·남성 한 줄, ‘선택 안 함’은 아래 한 줄 전체 */
+@media (max-width: 440px) { .entry-panel .grid-3 { grid-template-columns: repeat(2, minmax(0, 1fr)); } .entry-panel .grid-3 .choice:nth-child(3) { grid-column: 1 / -1; } }
 .entry-panel .input { background: #FFFDF8; }
 .entry-foot { margin: 8px calc(-1 * var(--gutter)) 0; height: clamp(90px, 26vw, 140px); overflow: hidden; }
 .entry-foot img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 75%; opacity: .45; }
@@ -529,8 +532,10 @@ img { display: block; max-width: 100%; height: auto; }
 .daily-date { margin: 0; display: flex; align-items: center; gap: 10px; font-family: var(--font-serif); font-size: clamp(14.5px, 4vw, 16px); font-weight: 600; color: var(--ink); }
 .daily-date img { width: clamp(42px, 12vw, 64px); height: auto; }
 .daily-date img:last-child { transform: scaleX(-1); }
-.daily-head h1 { position: relative; margin: 2px 0 0; font-size: clamp(46px, 14vw, 66px); line-height: 1.15; letter-spacing: .04em; }
-.daily-head h1 .stamp { position: absolute; right: -0.9em; top: .3em; font-size: clamp(30px, 8vw, 38px); }
+.daily-head h1 { position: relative; margin: 2px 0 0; font-size: clamp(40px, 12.5vw, 66px); line-height: 1.15; letter-spacing: .04em; }
+.daily-head h1 { --st: clamp(26px, 7vw, 36px); display: inline-flex; align-items: flex-start; padding-left: calc(var(--st) * 1.25 + 8px); }
+.daily-head h1 .stamp { position: static; flex: none; font-size: var(--st); margin: .2em 0 0 8px; }
+@media (max-width: 400px) { .daily-head h1 { padding-left: 0; } }
 .daily-iljin { margin: 0; font-family: var(--font-serif); font-size: 13.5px; color: var(--ink-3); }
 .daily-iljin b { color: var(--navy); font-weight: 700; }
 .daily .knot { margin-top: 2px; }
@@ -641,7 +646,8 @@ img { display: block; max-width: 100%; height: auto; }
 .export-sun { position: absolute; top: 46px; right: 60px; width: 64px; opacity: .85; }
 .export-head { position: absolute; top: 34px; left: 0; right: 0; display: flex; flex-direction: column; align-items: center; gap: 2px; }
 .export-brand { position: relative; font-size: 58px; line-height: 1.1; }
-.export-brand .stamp { position: absolute; right: -.62em; bottom: .2em; font-size: 26px; }
+.export-brand { display: inline-flex; align-items: flex-end; padding-left: 42px; }
+.export-brand .stamp { position: static; flex: none; font-size: 26px; margin: 0 0 .3em 10px; }
 .export-han { font-family: var(--font-serif); font-size: 13px; letter-spacing: .3em; color: var(--gold-text); }
 .export-foot { display: flex; flex-direction: column; align-items: center; gap: 10px; text-align: center; padding-top: 6px; }
 .export-foot p { margin: 0; max-width: 560px; font-size: 12.5px; line-height: 1.7; color: var(--ink-3); }
@@ -651,7 +657,8 @@ img { display: block; max-width: 100%; height: auto; }
 .export-root .daily { gap: 24px; }
 .export-root .daily-head__land { top: 22px; height: 150px; }
 .export-root .daily-date { font-size: 16px; } .export-root .daily-date img { width: 64px; }
-.export-root .daily-head h1 { font-size: 64px; } .export-root .daily-head h1 .stamp { font-size: 36px; }
+.export-root .daily-head h1 { font-size: 64px; --st: 36px; padding-left: 57px; }
+.export-root .daily-head h1 .stamp { margin-left: 12px; }
 .export-root .total { grid-template-columns: 66px minmax(0, 1fr); }
 .export-root .total__label { font-size: 30px; }
 .export-root .total__body { padding: 18px 22px; } .export-root .total__body h2 { font-size: 23px; }

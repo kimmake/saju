@@ -19,7 +19,7 @@ export default function HomeCover({ savedLine, onStart, onToday, onSaju, onEdit,
 
       <header className="cover-head">
         <p className="cover-head__kicker">나의 운을 읽고, 좋은 인연을 연결하다</p>
-        <h1 className="brush">운결<Stamp ch="命" /></h1>
+        <h1 className="brush"><span>운결</span><Stamp ch="命" /></h1>
         <p className="cover-head__sub"><b>運結</b>사주로 읽는 나의 흐름</p>
       </header>
 

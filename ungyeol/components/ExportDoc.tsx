@@ -22,7 +22,7 @@ const ExportDoc = forwardRef<HTMLDivElement, Props>(function ExportDoc({ kind, t
         <img className="export-pine" src="/art/pine.webp" alt="" />
         <img className="export-sun" src="/art/sun.webp" alt="" />
         <header className="export-head">
-          <span className="brush export-brand">운결<Stamp ch="命" /></span>
+          <span className="brush export-brand"><span>운결</span><Stamp ch="命" /></span>
           <span className="export-han">運結 · {kind === 'full' ? '사주 해석서' : '오늘의 운세첩'}</span>
           <Knot />
         </header>
