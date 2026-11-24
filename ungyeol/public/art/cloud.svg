@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 30" fill="none" stroke="#B4975D" stroke-width="1.2" stroke-linecap="round">
+  <!-- 구름문(雲紋): 말려 올라가는 두 개의 구름 소용돌이와 꼬리선 -->
+  <path d="M2 22h30c6 0 9-4 9-8s-3-7-7-7-6 3-6 6 2 4 4 4 3-1 3-3"/>
+  <path d="M41 22h14c5 0 8-3 8-7s-3-6-6-6-5 2-5 5 2 3 3 3"/>
+  <path d="M63 22h31"/>
+  <path d="M20 27h44" opacity=".6"/>
+</svg>
