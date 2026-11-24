@@ -12,20 +12,27 @@ const EL: Record<Element, [string, string, string, string]> = {
 const ELX: Record<string, [string, string, string, string]> = { ...EL, none: ['', '#B3AB9C', '', ''] };
 const NUM = ['一', '二', '三', '四', '五', '六', '七', '八'];
 const PILLAR_HAN: Record<string, string> = { 시주: '時柱', 일주: '日柱', 월주: '月柱', 년주: '年柱' };
+/** 표시 순서: 운(運) 장은 가나다순, 띠 궁합과 2027년 풀이는 그 뒤로. (데이터 순서는 바꾸지 않는다) */
+const TAIL = ['match', 'year', 'sewoon'];
+const orderSections = (list: AnalyzeResult['sections']) => [
+  ...list.filter(s => !TAIL.includes(s.id)).sort((a, b) => a.title.localeCompare(b.title, 'ko')),
+  ...TAIL.map(id => list.find(s => s.id === id)).filter((s): s is AnalyzeResult['sections'][number] => !!s),
+];
 const SHORT: Record<string, string> = { children: '자녀운', spouse: '배우자운', money: '금전운', work: '직장운', match: '어울리는 띠', year: '2027년 띠', sewoon: '2027년 운세', study: '공부운' };
 
 interface Props { result: AnalyzeResult; title: string; birthLine: string; onEdit?: () => void; onRestart?: () => void; onRetry?: () => void; onSave?: () => void; saving?: boolean; print?: boolean }
 
 export default function ResultScreen({ result: R, title, birthLine, onEdit, onRestart, onRetry, onSave, saving, print }: Props) {
-  const [active, setActive] = useState(R.sections[0].id);
+  const sections = orderSections(R.sections);
+  const [active, setActive] = useState(sections[0].id);
   const [open, setOpen] = useState<Record<string, boolean>>({});
   useEffect(() => {
     if (print) return;
     const onScroll = () => {
-      let cur = R.sections[0].id;
-      for (const s of R.sections) { const el = document.getElementById('sec-' + s.id); if (el && el.getBoundingClientRect().top < 200) cur = s.id; }
+      let cur = sections[0].id;
+      for (const s of sections) { const el = document.getElementById('sec-' + s.id); if (el && el.getBoundingClientRect().top < 200) cur = s.id; }
       // 맨 아래까지 내리면 마지막 장이 화면 위쪽에 닿지 못하므로 마지막 장을 표시한다.
-      if (window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 4) cur = R.sections[R.sections.length - 1].id;
+      if (window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 4) cur = sections[sections.length - 1].id;
       setActive(cur);
     };
     window.addEventListener('scroll', onScroll, { passive: true });
@@ -41,7 +48,7 @@ export default function ResultScreen({ result: R, title, birthLine, onEdit, onRe
   const saveLabel = saving ? '이미지 만드는 중…' : '결과 저장하기';
   const max = Math.max(...Object.values(R.elements), 1);
   const day = R.pillars.find(p => p.isDay);
-  const navItems = R.sections.map((s, i) => ({ id: s.id, no: NUM[i], short: SHORT[s.id] || s.title, on: active === s.id }));
+  const navItems = sections.map((s, i) => ({ id: s.id, no: NUM[i], short: SHORT[s.id] || s.title, on: active === s.id }));
 
   return (
     <div className="result">
@@ -149,7 +156,7 @@ export default function ResultScreen({ result: R, title, birthLine, onEdit, onRe
                 </div>
               </nav>
             )}
-            {R.sections.map((s, i) => <SectionCard key={s.id} section={s} no={NUM[i]} first={i === 0} open={!!open[s.id]} print={print} onToggle={() => setOpen(o => ({ ...o, [s.id]: !o[s.id] }))} />)}
+            {sections.map((s, i) => <SectionCard key={s.id} section={s} no={NUM[i]} first={i === 0} open={!!open[s.id]} print={print} onToggle={() => setOpen(o => ({ ...o, [s.id]: !o[s.id] }))} />)}
           </div>
 
           <footer className="colophon">
