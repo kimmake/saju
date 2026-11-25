@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { ZODIAC } from '@/lib/saju/constants';
 import { Chevron, RuleOrn } from './Ornaments';
 import type { MatchRank, Section, YearRank } from '@/lib/saju/types';
@@ -10,6 +11,11 @@ interface Props { section: Section; no: string; first?: boolean; open: boolean; 
 /** 해석서의 한 장(章). 카드 대신 금박 구분선과 소제목으로 나눈다. */
 export default function SectionCard({ section: s, no, first, open: openProp, onToggle, print }: Props) {
   const open = print || openProp;
+  // 긴 풀이는 앞 두 문단만 먼저 보여 주고 나머지는 펼쳐 읽게 한다 (저장 이미지·PDF에는 모두 들어간다)
+  const [more, setMore] = useState(false);
+  const LEAD = 2;
+  const foldable = !print && s.type === 'fortune' && s.body.length > LEAD + 1;
+  const shown = s.type === 'fortune' && foldable && !more ? s.body.slice(0, LEAD) : s.type === 'fortune' ? s.body : [];
   return (
     <section id={print ? undefined : 'sec-' + s.id} aria-labelledby={'h-' + s.id} className="chapter">
       {!first && <RuleOrn className="chapter__orn" />}
@@ -24,9 +30,14 @@ export default function SectionCard({ section: s, no, first, open: openProp, onT
 
       {s.type === 'fortune' && (
         <>
-          <div className="chapter__body">
-            {s.body.map((para, i) => <p key={i}>{para}</p>)}
+          <div className="chapter__body" id={'b-' + s.id}>
+            {shown.map((para, i) => <p key={i}>{para}</p>)}
           </div>
+          {foldable && (
+            <button className="link-btn read-more" aria-expanded={more} aria-controls={'b-' + s.id} onClick={() => setMore(m => !m)}>
+              {more ? '풀이 접기' : `이어서 읽기 · ${s.body.length - LEAD}문단 더`}<Chevron open={more} />
+            </button>
+          )}
           {s.tips.length > 0 && (
             <div className="tips">
               <h3><i aria-hidden="true" />이렇게 활용해 보세요</h3>
