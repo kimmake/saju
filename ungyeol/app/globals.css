@@ -688,3 +688,24 @@ img { display: block; max-width: 100%; height: auto; }
 .export-root .yrank { grid-template-columns: 170px repeat(3, minmax(0, 1fr)); }
 .export-root .colophon { margin-top: 64px; }
 .export-root .boundary, .export-root .details, .export-root .frow__detail, .export-root .total__more, .export-root .basis2 ul { animation: none; }
+
+/* ── 읽기 편하게: 긴 본문은 고딕(Pretendard), 제목·요약·인용은 명조 그대로 ── */
+:root { --read: #2F2C27; }
+.chapter__body p, .frow__detail p, .total__more dd, .details dd, .rank p.rank__reason, .zwhy p, .supplement dd, .supplement > p, .yrank__cell span, .boundary, .criteria p, .tips li span {
+  font-family: var(--font-sans); letter-spacing: -0.012em; color: var(--read);
+}
+.chapter__body { gap: 16px; max-width: 38em; }
+.chapter__body p { font-size: 16.5px; line-height: 1.85; }
+.chapter__body p:first-child::first-letter { font-size: inherit; font-weight: inherit; color: inherit; }
+.chapter__summary { font-size: clamp(17px, 4.4vw, 19px); line-height: 1.7; }
+.read-more { margin-top: 6px; }
+.tips li { font-family: var(--font-sans); font-size: 15.5px; line-height: 1.75; letter-spacing: -0.01em; }
+.tips li b { align-self: start; }
+.details dd, .supplement dd, .rank p.rank__reason, .yrank__cell span, .boundary { font-size: 15.5px; line-height: 1.8; }
+.zwhy p, .criteria p, .supplement > p { font-size: 15px; line-height: 1.78; }
+.frow__detail p { font-size: 15.5px; line-height: 1.82; }
+.total__more dd { font-size: 15px; line-height: 1.8; color: var(--read); }
+.total__more dd p { margin: 0 0 8px; }
+.details dt, .supplement dt { letter-spacing: -0.005em; }
+@media (max-width: 380px) { .chapter__body p { font-size: 16px; } .tips li, .details dd, .frow__detail p { font-size: 15px; } }
+.export-root .chapter__body p { font-size: 16.5px; }
